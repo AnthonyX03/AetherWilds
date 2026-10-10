@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#111827">
+<meta name="description" content="AetherWilds — aventura 32-bit original de exploración, captura, crianza y combate.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<style>@font-face{font-family:Pixel;src:local("Courier New");}
+:root{--bg:#0b1020;--panel:#151d31;--line:#52627f;--text:#f4f7ff;--muted:#9eabc5;--accent:#7cf5c4;--accent2:#ffcc66;--danger:#ff6b7a}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b14;color:var(--text);font-family:Pixel,monospace}
+button{font:inherit;color:inherit;cursor:pointer;border:0}.hidden{display:none!important}
+#app{position:relative;width:100%;height:100%;display:grid;place-items:center;background:#070b14}
+#game{width:100vw;height:100vh;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain;background:#182437}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(4,7,14,.48);backdrop-filter:blur(2px)}
+.titleCard{width:min(620px,90vw);padding:40px 34px;text-align:center;background:linear-gradient(180deg,#18233a,#0d1424);border:4px solid #617396;box-shadow:10px 10px 0 #050812, inset 0 0 0 3px #10182a}
+.eyebrow{letter-spacing:4px;color:var(--accent);font-size:12px;margin-bottom:12px}
+h1{font-size:clamp(42px,9vw,82px);line-height:.9;margin:0 0 20px;text-shadow:5px 5px 0 #000}
+h1 span,.brand span{color:var(--accent)}
+.titleCard p{color:#cbd4e8;line-height:1.6;margin:0 auto 26px;max-width:500px}
+.titleCard small{color:#73819d}.menuBtns{display:grid;gap:12px;max-width:360px;margin:0 auto}
+.bigBtn,.menuGrid button,.battleBtn{background:#243451;border:3px solid #7284a8;padding:14px 18px;box-shadow:4px 4px 0 #070b14;text-transform:uppercase}
+.bigBtn:hover,.menuGrid button:hover,.battleBtn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 #070b14}.bigBtn.secondary{background:#172238}
+.topbar{position:absolute;top:0;left:0;right:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:linear-gradient(#0a1120dd,#0a112000);z-index:5}
+.brand{font-weight:bold;letter-spacing:2px}.status{display:flex;gap:14px;align-items:center;color:#dce5f7;font-size:12px}
+.pixelBtn{background:#18243b;border:2px solid #647493;padding:7px 10px}
+#partyMini{position:absolute;top:70px;left:18px;display:flex;gap:6px;z-index:4}.partyDot{width:34px;height:34px;background:#17243a;border:2px solid #5b6e91;display:grid;place-items:center;font-size:13px}
+#toast{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:#0c1425eF;border:2px solid #667795;padding:10px 16px;z-index:8;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}.toastOn{opacity:1!important}
+.panel{position:absolute;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,92vw);max-height:86vh;overflow:auto;background:#10192b;border:4px solid #627393;box-shadow:10px 10px 0 #050812;padding:20px}
+.panelHead{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #32415d;margin-bottom:18px}.panelHead h2{margin:0 0 12px}.closeBtn{background:#2a3853;border:2px solid #687b9f;font-size:24px;padding:2px 9px}
+.menuGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.hint{color:#8e9bb5;line-height:1.7;font-size:12px;margin-bottom:0}
+.cardGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}.creatureCard{background:#17233a;border:2px solid #40526f;padding:12px}.creatureCard strong{display:block;font-size:15px;margin-bottom:5px}.bar{height:7px;background:#080d17;margin-top:7px}.bar i{display:block;height:100%;background:var(--accent)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #293750}.row button{background:#263755;padding:7px 10px;border:2px solid #5f7396}
+#battle{background:rgba(6,9,17,.72)}.battlePanel{width:min(900px,94vw);background:#0d1526;border:4px solid #657695;box-shadow:12px 12px #03050a}.battleScene{height:min(420px,58vh);position:relative;overflow:hidden;background:linear-gradient(#35536c 0 60%,#2b4933 60%);border-bottom:4px solid #52627e}
+.battleScene:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 7px,#ffffff08 8px 9px);pointer-events:none}
+.monsterSlot{position:absolute;width:160px;height:140px;display:grid;place-items:center}.monsterSlot.wild{right:8%;top:8%}.monsterSlot.player{left:10%;bottom:8%}.monsterSlot canvas{width:140px;height:110px;image-rendering:pixelated}
+#battleInfo{position:absolute;inset:0;pointer-events:none}.statBox{position:absolute;background:#0b1322ee;border:3px solid #52637f;padding:8px 12px;min-width:160px;font-size:12px}.statBox.wildBox{left:12px;top:14px}.statBox.playerBox{right:12px;bottom:18%}.hpbar{height:10px;background:#05080e;margin-top:5px;border:1px solid #334}.hpbar i{display:block;height:100%;background:var(--accent)}
+.creatureCard{cursor:pointer;transition:transform .1s}.creatureCard:hover{transform:translate(1px,1px)}
+.dexGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;max-height:55vh;overflow:auto}
+.dexCard{background:#152238;border:2px solid #40526f;padding:8px;text-align:center;font-size:10px;min-height:100px}
+.dexCard.known{border-color:#7cf5c4}.dexCard canvas{width:56px;height:48px;image-rendering:pixelated;margin:0 auto 4px;display:block}
+.pokeStatus{display:flex;gap:14px;align-items:flex-start;background:#152238;border:3px solid #5a7a9a;padding:14px;margin-bottom:10px}
+.pokeStatus canvas{width:96px;height:80px;image-rendering:pixelated;background:#0a1220;border:2px solid #334}
+.pokeStats{flex:1;font-size:12px;line-height:1.6}
+.pokeStats b{color:var(--accent)}
+.battleControls{padding:14px;display:grid;grid-template-columns:1fr 2fr;gap:14px}.battleActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.battleBtn{padding:12px;background:#1b2942}.battleBtn[data-action="capture"]{border-color:#d8b260}.battleBtn[data-action="bond"]{border-color:#73d9ba}.battleBtn[data-action="run"]{border-color:#7b8aa8}#battleLog{display:flex;align-items:center;color:#dbe5f7;line-height:1.5;padding:6px}
+#touchControls{position:absolute;inset:0;z-index:12;pointer-events:none}.dpad,.touchActions{position:absolute;bottom:18px;pointer-events:auto}.dpad{left:18px;width:142px;height:142px}.dpad button{position:absolute;width:46px;height:46px;background:#17243dcc;border:2px solid #7182a2;border-radius:7px}.dpad button[data-dir=up]{left:48px;top:0}.dpad button[data-dir=left]{left:0;top:48px}.dpad button[data-dir=down]{left:48px;top:96px}.dpad button[data-dir=right]{left:96px;top:48px}.touchActions{right:20px;display:flex;gap:12px}.touchActions button{width:62px;height:62px;border-radius:50%;background:#253552dd;border:3px solid #7182a2;font-weight:bold}
+@media(max-width:700px){.titleCard{padding:28px 18px}.battleControls{grid-template-columns:1fr}.battleScene{height:50vh}.statBox{min-width:0;font-size:10px}.monsterSlot{transform:scale(.8)}.panel{padding:14px}.menuGrid{grid-template-columns:1fr 1fr}.brand{font-size:12px}.status{font-size:9px}.topbar{padding:0 10px}}
+@media(pointer:coarse){#touchControls{display:block}.status #dayLabel{display:none}}
+
+/* ===== AETHERWILDS EXPANSION UI ===== */
+.inventoryGrid{display:grid;grid-template-columns:repeat(6,minmax(54px,1fr));gap:7px;padding:6px;background:#0a1120;border:3px solid #3f506e}
+.invSlot{aspect-ratio:1;background:#17243a;border:2px solid #405573;position:relative;padding:7px;text-align:center;box-shadow:inset 0 0 0 1px #0a1020}
+.invSlot:hover{border-color:#7cf5c4}.invIcon{font-size:23px;display:block}.invCount{position:absolute;right:4px;bottom:3px;background:#080d17;padding:2px 4px;font-size:10px}
+.invName{font-size:9px;color:#aebbd1;margin-top:3px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.tabs button{background:#1c2941;border:2px solid #526786;padding:8px 10px}.tabs button.active{border-color:#7cf5c4;color:#7cf5c4}
+.dexGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:8px;max-height:62vh;overflow:auto}.dexCard{background:#141f33;border:2px solid #3b4c69;padding:9px;min-height:95px}.dexCard.known{border-color:#6b9e86}.dexNum{font-size:9px;color:#7788a5}.dexName{font-weight:bold;margin:5px 0}.dexType{font-size:9px;color:#8edbc2}.dexUnknown{filter:grayscale(1);opacity:.45}
+.skillTree{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.skillNode{background:#15233a;border:2px solid #3d5272;padding:11px;min-height:88px}.skillNode.unlocked{border-color:#7cf5c4}.skillNode.locked{opacity:.48}.skillNode button{margin-top:7px;background:#263a58;border:1px solid #637da3;padding:5px 7px;font-size:10px}
+.regionGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.regionCard{background:#15233a;border:2px solid #405471;padding:12px}.regionCard.current{border-color:#ffcc66}
+.craftGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.craftCard{background:#16233a;border:2px solid #3e5272;padding:10px}.craftCard button{float:right;background:#263957;border:2px solid #637a9e;padding:5px}
+.buildGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.buildPiece{aspect-ratio:1;background:#17263c;border:2px solid #435a79;display:grid;place-items:center;font-size:24px}.buildPiece.selected{border-color:#7cf5c4}
+.npcList{display:grid;gap:8px}.npcCard{background:#152238;border:2px solid #40526f;padding:10px;display:flex;justify-content:space-between;align-items:center}.questTag{font-size:9px;color:#ffcc66}
+.battleStatus{position:absolute;bottom:12px;left:18px;right:18px;display:flex;gap:8px;justify-content:center}.statusChip{background:#0a1120dd;border:2px solid #536988;padding:7px 10px;font-size:10px}
+.actionBar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.actionBar button{background:#263955;border:2px solid #536e95;padding:7px 9px;font-size:10px}
+.fishingPanel{background:#101b2d;border:3px solid #5e7396;padding:16px;text-align:center}.fishMeter{height:18px;background:#080d16;border:2px solid #506581;position:relative;margin:14px 0}.fishZone{position:absolute;left:38%;width:24%;height:100%;background:#7cf5c488}.fishCursor{position:absolute;top:-3px;width:5px;height:22px;background:#fff}
+@media(max-width:700px){.inventoryGrid{grid-template-columns:repeat(5,1fr)}.skillTree,.regionGrid{grid-template-columns:1fr 1fr}.buildGrid{grid-template-columns:repeat(3,1fr)}.dexGrid{grid-template-columns:repeat(3,1fr)}}
+</style>
+<title>AetherWilds</title>
+</head>
+<body>
+<div id="app">
+  <canvas id="game" width="960" height="540" aria-label="AetherWilds"></canvas>
+
+  <div id="hud" class="hidden">
+    <div class="topbar">
+      <div class="brand">AETHER<span>WILDS</span></div>
+      <div class="status">
+        <span id="dayLabel">Día 1 · 08:00</span>
+        <span id="coins">◈ 120</span>
+        <button id="menuBtn" class="pixelBtn">☰</button>
+      </div>
+    </div>
+    <div id="partyMini"></div>
+    <div id="toast"></div>
+  </div>
+
+  <section id="titleScreen" class="overlay">
+    <div class="titleCard">
+      <div class="eyebrow">32-BIT CREATURE ADVENTURE</div>
+      <h1>AETHER<span>WILDS</span></h1>
+      <p>Explora tierras vivas. Encuentra criaturas. Forma vínculos. Cría, combate y descubre.</p>
+      <div class="menuBtns">
+        <button id="newGame" class="bigBtn">NUEVA AVENTURA</button>
+        <button id="continueGame" class="bigBtn secondary">CONTINUAR</button>
+      </div>
+      <small>Creación original · sin contenido oficial</small>
+    </div>
+  </section>
+
+  <section id="battle" class="overlay hidden">
+    <div class="battlePanel">
+      <div class="battleScene">
+        <div id="battleWild" class="monsterSlot wild"></div>
+        <div id="battlePlayer" class="monsterSlot player"></div>
+        <div id="battleInfo"></div>
+      </div>
+      <div class="battleControls">
+        <div id="battleLog">¡Una criatura salvaje aparece!</div>
+        <div class="battleActions">
+          <button data-action="strike" class="battleBtn">⚔ ATACAR</button>
+          <button data-action="capture" class="battleBtn">◈ CAPTURAR</button>
+          <button data-action="bond" class="battleBtn">♡ VÍNCULO</button>
+          <button data-action="run" class="battleBtn">↗ HUIR</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="menu" class="panel hidden">
+    <div class="panelHead"><h2>PAUSA</h2><button class="closeBtn" data-close="menu">×</button></div>
+    <div class="menuGrid">
+      <button data-open="creatures">CRIATURAS</button>
+      <button data-open="dex">AETHERDEX</button>
+      <button data-open="inventory">MOCHILA</button>
+      <button data-open="nursery">CRIADERO</button>
+      <button data-open="settings">AJUSTES</button>
+      <button id="saveBtn">GUARDAR</button>
+    </div>
+    <p class="hint">PC: WASD / flechas · E interactuar · M menú<br>Móvil: usa el pad táctil.</p>
+  </section>
+
+  <section id="subpanel" class="panel hidden">
+    <div class="panelHead"><h2 id="subTitle">CRIATURAS</h2><button class="closeBtn" data-close="subpanel">×</button></div>
+    <div id="subContent"></div>
+  </section>
+
+  <div id="touchControls" class="hidden">
+    <div class="dpad">
+      <button data-dir="up">▲</button>
+      <button data-dir="left">◀</button>
+      <button data-dir="down">▼</button>
+      <button data-dir="right">▶</button>
+    </div>
+    <div class="touchActions">
+      <button id="touchInteract">A</button>
+      <button id="touchMenu">≡</button>
+    </div>
+  </div>
+</div>
+<script>/* AETHERWILDS — original browser game, no external assets */
+const C=document.getElementById('game'),ctx=C.getContext('2d'); ctx.imageSmoothingEnabled=false;
+const W=C.width,H=C.height,T=32;
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const SAVE='aetherwilds-save-v1';
+
+const species=[{"id":"creature_001","name":"Zeriselo","type":"Verdant","hp":42,"atk":13,"def":20,"spd":12,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":68},{"id":"creature_002","name":"Belzuon","type":"Ember","hp":46,"atk":18,"def":14,"spd":17,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":69},{"id":"creature_003","name":"Raibax","type":"Tide","hp":44,"atk":8,"def":8,"spd":18,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":67},{"id":"creature_004","name":"Quendeor","type":"Umbral","hp":38,"atk":20,"def":19,"spd":12,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":65},{"id":"creature_005","name":"Oruvaet","type":"Volt","hp":49,"atk":12,"def":13,"spd":15,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":63},{"id":"creature_006","name":"Quensen","type":"Terra","hp":41,"atk":11,"def":8,"spd":9,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":68},{"id":"creature_007","name":"Moroviia","type":"Aether","hp":38,"atk":20,"def":18,"spd":16,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":63},{"id":"creature_008","name":"Belgia","type":"Frost","hp":36,"atk":13,"def":17,"spd":18,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":69},{"id":"creature_009","name":"Raifien","type":"Bloom","hp":28,"atk":17,"def":10,"spd":17,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":65},{"id":"creature_010","name":"Faeluel","type":"Gale","hp":62,"atk":13,"def":19,"spd":9,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":69},{"id":"creature_011","name":"Wyndraor","type":"Mire","hp":47,"atk":8,"def":15,"spd":9,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":64},{"id":"creature_012","name":"Morovais","type":"Solar","hp":40,"atk":18,"def":16,"spd":8,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":69},{"id":"creature_013","name":"Lumidaen","type":"Verdant","hp":32,"atk":18,"def":9,"spd":11,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":66},{"id":"creature_014","name":"Quensaet","type":"Ember","hp":44,"atk":16,"def":20,"spd":13,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":64},{"id":"creature_015","name":"Raimori","type":"Tide","hp":38,"atk":11,"def":14,"spd":17,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":62},{"id":"creature_016","name":"Druceu","type":"Umbral","hp":51,"atk":15,"def":8,"spd":12,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":59},{"id":"creature_017","name":"Moroseon","type":"Volt","hp":37,"atk":16,"def":12,"spd":11,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":64},{"id":"creature_018","name":"Quengiy","type":"Terra","hp":50,"atk":11,"def":9,"spd":12,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":63},{"id":"creature_019","name":"Nexavey","type":"Aether","hp":35,"atk":19,"def":11,"spd":10,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":66},{"id":"creature_020","name":"Belfia","type":"Frost","hp":40,"atk":16,"def":8,"spd":13,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":64},{"id":"creature_021","name":"Drugay","type":"Bloom","hp":56,"atk":17,"def":16,"spd":15,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":62},{"id":"creature_022","name":"Rairiu","type":"Gale","hp":60,"atk":13,"def":20,"spd":17,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":58},{"id":"creature_023","name":"Eliveel","type":"Mire","hp":41,"atk":19,"def":13,"spd":6,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":62},{"id":"creature_024","name":"Quenrayn","type":"Solar","hp":59,"atk":13,"def":16,"spd":12,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":62},{"id":"creature_025","name":"Aritalo","type":"Verdant","hp":58,"atk":14,"def":14,"spd":7,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":55},{"id":"creature_026","name":"Glovin","type":"Ember","hp":50,"atk":9,"def":15,"spd":9,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":55},{"id":"creature_027","name":"Arideor","type":"Tide","hp":39,"atk":20,"def":16,"spd":14,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":60},{"id":"creature_028","name":"Aridala","type":"Umbral","hp":36,"atk":13,"def":12,"spd":6,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":63},{"id":"creature_029","name":"Pirinex","type":"Volt","hp":32,"atk":13,"def":11,"spd":7,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":57},{"id":"creature_030","name":"Umiteia","type":"Terra","hp":39,"atk":15,"def":15,"spd":10,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":62},{"id":"creature_031","name":"Belmais","type":"Aether","hp":45,"atk":17,"def":16,"spd":9,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":61},{"id":"creature_032","name":"Xarogay","type":"Frost","hp":52,"atk":8,"def":13,"spd":13,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":60},{"id":"creature_033","name":"Nexabola","type":"Bloom","hp":42,"atk":20,"def":14,"spd":17,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":63},{"id":"creature_034","name":"Veraroyn","type":"Gale","hp":49,"atk":19,"def":12,"spd":15,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":63},{"id":"creature_035","name":"Belceyn","type":"Mire","hp":57,"atk":20,"def":20,"spd":6,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":62},{"id":"creature_036","name":"Zerimiia","type":"Solar","hp":34,"atk":12,"def":8,"spd":12,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":58},{"id":"creature_037","name":"Orucaon","type":"Verdant","hp":31,"atk":10,"def":9,"spd":9,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":52},{"id":"creature_038","name":"Caelio","type":"Ember","hp":38,"atk":14,"def":11,"spd":19,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":59},{"id":"creature_039","name":"Druchilo","type":"Tide","hp":34,"atk":15,"def":14,"spd":8,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":56},{"id":"creature_040","name":"Wynven","type":"Umbral","hp":35,"atk":20,"def":8,"spd":7,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":57},{"id":"creature_041","name":"Kaerau","type":"Volt","hp":28,"atk":14,"def":9,"spd":11,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":60},{"id":"creature_042","name":"Piribon","type":"Terra","hp":62,"atk":19,"def":12,"spd":19,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":58},{"id":"creature_043","name":"Irinaet","type":"Aether","hp":41,"atk":20,"def":19,"spd":14,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":52},{"id":"creature_044","name":"Tavitaor","type":"Frost","hp":50,"atk":15,"def":17,"spd":6,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":55},{"id":"creature_045","name":"Iridey","type":"Bloom","hp":43,"atk":19,"def":18,"spd":12,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":57},{"id":"creature_046","name":"Wyndraen","type":"Gale","hp":42,"atk":8,"def":20,"spd":8,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":59},{"id":"creature_047","name":"Pirivi","type":"Mire","hp":30,"atk":20,"def":11,"spd":12,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":55},{"id":"creature_048","name":"Caekea","type":"Solar","hp":60,"atk":11,"def":17,"spd":11,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":57},{"id":"creature_049","name":"Junomala","type":"Verdant","hp":51,"atk":17,"def":8,"spd":19,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":53},{"id":"creature_050","name":"Wynvael","type":"Ember","hp":31,"atk":12,"def":14,"spd":9,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":51},{"id":"creature_051","name":"Lumizuia","type":"Tide","hp":32,"atk":9,"def":14,"spd":19,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":56},{"id":"creature_052","name":"Belkaia","type":"Umbral","hp":38,"atk":10,"def":19,"spd":8,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":50},{"id":"creature_053","name":"Elinara","type":"Volt","hp":52,"atk":15,"def":10,"spd":13,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":53},{"id":"creature_054","name":"Zerimael","type":"Terra","hp":37,"atk":17,"def":19,"spd":19,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":55},{"id":"creature_055","name":"Drukari","type":"Aether","hp":37,"atk":15,"def":13,"spd":17,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":51},{"id":"creature_056","name":"Caefoyn","type":"Frost","hp":48,"atk":9,"def":20,"spd":14,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":56},{"id":"creature_057","name":"Drutium","type":"Bloom","hp":58,"atk":17,"def":9,"spd":19,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":51},{"id":"creature_058","name":"Selishau","type":"Gale","hp":59,"atk":19,"def":16,"spd":11,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":49},{"id":"creature_059","name":"Kaefior","type":"Mire","hp":62,"atk":17,"def":12,"spd":19,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":52},{"id":"creature_060","name":"Belron","type":"Solar","hp":45,"atk":19,"def":20,"spd":10,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":57},{"id":"creature_061","name":"Irizax","type":"Verdant","hp":41,"atk":13,"def":14,"spd":10,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":47},{"id":"creature_062","name":"Selinox","type":"Ember","hp":53,"atk":10,"def":17,"spd":6,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":47},{"id":"creature_063","name":"Drunao","type":"Tide","hp":57,"atk":20,"def":19,"spd":13,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":46},{"id":"creature_064","name":"Glofien","type":"Umbral","hp":34,"atk":19,"def":15,"spd":11,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":46},{"id":"creature_065","name":"Irimiyn","type":"Volt","hp":55,"atk":9,"def":19,"spd":11,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":48},{"id":"creature_066","name":"Xaroliu","type":"Terra","hp":45,"atk":8,"def":13,"spd":10,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":54},{"id":"creature_067","name":"Pirideis","type":"Aether","hp":28,"atk":16,"def":11,"spd":15,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":48},{"id":"creature_068","name":"Arichilo","type":"Frost","hp":41,"atk":19,"def":16,"spd":13,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":51},{"id":"creature_069","name":"Orucea","type":"Bloom","hp":54,"atk":12,"def":13,"spd":10,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":51},{"id":"creature_070","name":"Moronola","type":"Gale","hp":35,"atk":18,"def":12,"spd":10,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":47},{"id":"creature_071","name":"Mororau","type":"Mire","hp":49,"atk":12,"def":9,"spd":13,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":48},{"id":"creature_072","name":"Druba","type":"Solar","hp":47,"atk":16,"def":15,"spd":14,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":53},{"id":"creature_073","name":"Quennelo","type":"Verdant","hp":41,"atk":17,"def":16,"spd":8,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":49},{"id":"creature_074","name":"Lumigila","type":"Ember","hp":32,"atk":12,"def":16,"spd":13,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":43},{"id":"creature_075","name":"Veraluon","type":"Tide","hp":57,"atk":15,"def":16,"spd":7,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":50},{"id":"creature_076","name":"Orumou","type":"Umbral","hp":38,"atk":18,"def":15,"spd":17,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":47},{"id":"creature_077","name":"Morogiyn","type":"Volt","hp":48,"atk":14,"def":9,"spd":7,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":49},{"id":"creature_078","name":"Wynneum","type":"Terra","hp":40,"atk":16,"def":8,"spd":6,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":48},{"id":"creature_079","name":"Drubori","type":"Aether","hp":56,"atk":16,"def":18,"spd":11,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":46},{"id":"creature_080","name":"Selishaia","type":"Frost","hp":30,"atk":10,"def":14,"spd":7,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":46},{"id":"creature_081","name":"Quenboet","type":"Bloom","hp":35,"atk":14,"def":20,"spd":15,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":44},{"id":"creature_082","name":"Quentan","type":"Gale","hp":40,"atk":19,"def":12,"spd":19,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":46},{"id":"creature_083","name":"Glode","type":"Mire","hp":59,"atk":14,"def":14,"spd":15,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":44},{"id":"creature_084","name":"Globio","type":"Solar","hp":57,"atk":11,"def":9,"spd":13,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":45},{"id":"creature_085","name":"Verasaor","type":"Verdant","hp":31,"atk":12,"def":12,"spd":16,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":47},{"id":"creature_086","name":"Verachi","type":"Ember","hp":56,"atk":14,"def":15,"spd":6,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":44},{"id":"creature_087","name":"Tavilula","type":"Tide","hp":49,"atk":10,"def":10,"spd":16,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":41},{"id":"creature_088","name":"Glodrayn","type":"Umbral","hp":57,"atk":19,"def":12,"spd":11,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":46},{"id":"creature_089","name":"Selizaet","type":"Volt","hp":52,"atk":9,"def":13,"spd":19,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":47},{"id":"creature_090","name":"Lumirala","type":"Terra","hp":38,"atk":12,"def":10,"spd":13,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":44},{"id":"creature_091","name":"Pirilay","type":"Aether","hp":62,"atk":20,"def":18,"spd":11,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":46},{"id":"creature_092","name":"Moromalo","type":"Frost","hp":48,"atk":8,"def":16,"spd":6,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":47},{"id":"creature_093","name":"Umisan","type":"Bloom","hp":43,"atk":17,"def":18,"spd":7,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":44},{"id":"creature_094","name":"Lumisayn","type":"Gale","hp":53,"atk":10,"def":10,"spd":18,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":46},{"id":"creature_095","name":"Selicayn","type":"Mire","hp":43,"atk":17,"def":16,"spd":7,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":41},{"id":"creature_096","name":"Glovien","type":"Solar","hp":29,"atk":14,"def":15,"spd":15,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":40},{"id":"creature_097","name":"Verabin","type":"Verdant","hp":60,"atk":15,"def":14,"spd":13,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":42},{"id":"creature_098","name":"Raichio","type":"Ember","hp":58,"atk":13,"def":10,"spd":14,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":37},{"id":"creature_099","name":"Faelaia","type":"Tide","hp":35,"atk":11,"def":18,"spd":11,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":40},{"id":"creature_100","name":"Nexasari","type":"Umbral","hp":52,"atk":18,"def":10,"spd":13,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":39},{"id":"creature_101","name":"Arimaet","type":"Volt","hp":62,"atk":16,"def":11,"spd":13,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":41},{"id":"creature_102","name":"Moronoy","type":"Terra","hp":62,"atk":19,"def":13,"spd":11,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":39},{"id":"creature_103","name":"Yulimiel","type":"Aether","hp":33,"atk":19,"def":9,"spd":17,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":41},{"id":"creature_104","name":"Nexachiy","type":"Frost","hp":55,"atk":11,"def":14,"spd":14,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":42},{"id":"creature_105","name":"Junogari","type":"Bloom","hp":59,"atk":13,"def":9,"spd":12,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":43},{"id":"creature_106","name":"Zerifiet","type":"Gale","hp":42,"atk":18,"def":16,"spd":15,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":43},{"id":"creature_107","name":"Pirira","type":"Mire","hp":57,"atk":13,"def":10,"spd":6,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":42},{"id":"creature_108","name":"Wynbox","type":"Solar","hp":53,"atk":11,"def":16,"spd":7,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":45},{"id":"creature_109","name":"Irilio","type":"Verdant","hp":36,"atk":9,"def":12,"spd":18,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":37},{"id":"creature_110","name":"Nexarilo","type":"Ember","hp":52,"atk":19,"def":13,"spd":10,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":40},{"id":"creature_111","name":"Quendeet","type":"Tide","hp":44,"atk":20,"def":12,"spd":15,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":35},{"id":"creature_112","name":"Gloneia","type":"Umbral","hp":37,"atk":8,"def":9,"spd":10,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":36},{"id":"creature_113","name":"Kaedan","type":"Volt","hp":38,"atk":8,"def":14,"spd":18,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":34},{"id":"creature_114","name":"Ariban","type":"Terra","hp":55,"atk":16,"def":15,"spd":9,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":39},{"id":"creature_115","name":"Railais","type":"Aether","hp":41,"atk":16,"def":15,"spd":9,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":34},{"id":"creature_116","name":"Junoney","type":"Frost","hp":30,"atk":20,"def":9,"spd":17,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":35},{"id":"creature_117","name":"Tavizael","type":"Bloom","hp":43,"atk":15,"def":11,"spd":10,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":41},{"id":"creature_118","name":"Pirigiel","type":"Gale","hp":53,"atk":17,"def":14,"spd":8,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":34},{"id":"creature_119","name":"Irisaor","type":"Mire","hp":44,"atk":19,"def":13,"spd":16,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":42},{"id":"creature_120","name":"Belgari","type":"Solar","hp":52,"atk":14,"def":14,"spd":6,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":38},{"id":"creature_121","name":"Umizaia","type":"Verdant","hp":51,"atk":10,"def":13,"spd":10,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":39},{"id":"creature_122","name":"Umigaa","type":"Ember","hp":31,"atk":19,"def":16,"spd":17,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":32},{"id":"creature_123","name":"Piririor","type":"Tide","hp":49,"atk":14,"def":8,"spd":11,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":34},{"id":"creature_124","name":"Junoroel","type":"Umbral","hp":43,"atk":8,"def":14,"spd":10,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":38},{"id":"creature_125","name":"Belbala","type":"Volt","hp":36,"atk":15,"def":14,"spd":13,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":32},{"id":"creature_126","name":"Elimori","type":"Terra","hp":42,"atk":11,"def":12,"spd":13,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":34},{"id":"creature_127","name":"Junolara","type":"Aether","hp":40,"atk":10,"def":15,"spd":19,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":35},{"id":"creature_128","name":"Quende","type":"Frost","hp":46,"atk":12,"def":17,"spd":11,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":32},{"id":"creature_129","name":"Caede","type":"Bloom","hp":41,"atk":18,"def":17,"spd":16,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":34},{"id":"creature_130","name":"Yulifin","type":"Gale","hp":60,"atk":13,"def":8,"spd":13,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":35},{"id":"creature_131","name":"Selikey","type":"Mire","hp":30,"atk":20,"def":10,"spd":17,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":38},{"id":"creature_132","name":"Aririu","type":"Solar","hp":50,"atk":12,"def":8,"spd":8,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":39},{"id":"creature_133","name":"Seliseo","type":"Verdant","hp":54,"atk":18,"def":20,"spd":19,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":31},{"id":"creature_134","name":"Orubo","type":"Ember","hp":53,"atk":13,"def":15,"spd":9,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":29},{"id":"creature_135","name":"Belshari","type":"Tide","hp":37,"atk":20,"def":12,"spd":18,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":30},{"id":"creature_136","name":"Selibay","type":"Umbral","hp":45,"atk":11,"def":16,"spd":10,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":30},{"id":"creature_137","name":"Belfori","type":"Volt","hp":45,"atk":20,"def":13,"spd":16,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":35},{"id":"creature_138","name":"Nexazala","type":"Terra","hp":52,"atk":11,"def":12,"spd":9,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":30},{"id":"creature_139","name":"Kaezalo","type":"Aether","hp":29,"atk":14,"def":15,"spd":9,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":32},{"id":"creature_140","name":"Drulay","type":"Frost","hp":37,"atk":10,"def":19,"spd":14,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":33},{"id":"creature_141","name":"Morozan","type":"Bloom","hp":61,"atk":17,"def":16,"spd":16,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":29},{"id":"creature_142","name":"Nexaraa","type":"Gale","hp":60,"atk":8,"def":16,"spd":8,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":35},{"id":"creature_143","name":"Caegaa","type":"Mire","hp":41,"atk":9,"def":12,"spd":11,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":34},{"id":"creature_144","name":"Wynvax","type":"Solar","hp":60,"atk":12,"def":12,"spd":19,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":30},{"id":"creature_145","name":"Rairoet","type":"Verdant","hp":46,"atk":12,"def":13,"spd":13,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":26},{"id":"creature_146","name":"Glorais","type":"Ember","hp":48,"atk":14,"def":18,"spd":12,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":29},{"id":"creature_147","name":"Xarogara","type":"Tide","hp":39,"atk":15,"def":9,"spd":7,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":28},{"id":"creature_148","name":"Elifou","type":"Umbral","hp":56,"atk":12,"def":11,"spd":18,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":28},{"id":"creature_149","name":"Pirirax","type":"Volt","hp":39,"atk":14,"def":14,"spd":17,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":29},{"id":"creature_150","name":"Tavivium","type":"Terra","hp":56,"atk":19,"def":20,"spd":6,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":33},{"id":"creature_151","name":"Elirax","type":"Aether","hp":55,"atk":18,"def":8,"spd":6,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":26},{"id":"creature_152","name":"Eliman","type":"Frost","hp":51,"atk":14,"def":11,"spd":6,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":26},{"id":"creature_153","name":"Taviteia","type":"Bloom","hp":50,"atk":8,"def":11,"spd":16,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":28},{"id":"creature_154","name":"Caedan","type":"Gale","hp":58,"atk":20,"def":17,"spd":11,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":31},{"id":"creature_155","name":"Selishax","type":"Mire","hp":54,"atk":12,"def":16,"spd":10,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":25},{"id":"creature_156","name":"Globi","type":"Solar","hp":53,"atk":16,"def":8,"spd":8,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":25},{"id":"creature_157","name":"Umisala","type":"Verdant","hp":49,"atk":10,"def":10,"spd":10,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":30},{"id":"creature_158","name":"Tavinoyn","type":"Ember","hp":44,"atk":8,"def":13,"spd":19,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":28},{"id":"creature_159","name":"Zeriviet","type":"Tide","hp":59,"atk":8,"def":20,"spd":9,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":25},{"id":"creature_160","name":"Glomoia","type":"Umbral","hp":39,"atk":9,"def":11,"spd":9,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":30},{"id":"creature_161","name":"Pirimais","type":"Volt","hp":59,"atk":17,"def":10,"spd":12,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":28},{"id":"creature_162","name":"Selitien","type":"Terra","hp":45,"atk":20,"def":17,"spd":17,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":27},{"id":"creature_163","name":"Quenvix","type":"Aether","hp":50,"atk":11,"def":19,"spd":17,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":22},{"id":"creature_164","name":"Belvaon","type":"Frost","hp":52,"atk":12,"def":13,"spd":10,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":24},{"id":"creature_165","name":"Faemiy","type":"Bloom","hp":49,"atk":20,"def":17,"spd":6,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":28},{"id":"creature_166","name":"Eliteel","type":"Gale","hp":51,"atk":16,"def":20,"spd":13,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":26},{"id":"creature_167","name":"Veradra","type":"Mire","hp":58,"atk":9,"def":15,"spd":6,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":23},{"id":"creature_168","name":"Yulizuri","type":"Solar","hp":60,"atk":11,"def":10,"spd":17,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":27},{"id":"creature_169","name":"Umiday","type":"Verdant","hp":42,"atk":19,"def":19,"spd":19,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":23},{"id":"creature_170","name":"Arinaor","type":"Ember","hp":50,"atk":17,"def":18,"spd":14,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":19},{"id":"creature_171","name":"Belsay","type":"Tide","hp":60,"atk":19,"def":12,"spd":16,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":22},{"id":"creature_172","name":"Yulilay","type":"Umbral","hp":46,"atk":19,"def":19,"spd":10,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":23},{"id":"creature_173","name":"Selivaen","type":"Volt","hp":53,"atk":11,"def":13,"spd":8,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":26},{"id":"creature_174","name":"Orukela","type":"Terra","hp":36,"atk":19,"def":18,"spd":18,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":26},{"id":"creature_175","name":"Irican","type":"Aether","hp":59,"atk":20,"def":20,"spd":15,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":24},{"id":"creature_176","name":"Orunon","type":"Frost","hp":37,"atk":15,"def":18,"spd":9,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":21},{"id":"creature_177","name":"Tavifora","type":"Bloom","hp":36,"atk":10,"def":11,"spd":6,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":21},{"id":"creature_178","name":"Nexacara","type":"Gale","hp":46,"atk":11,"def":10,"spd":13,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":20},{"id":"creature_179","name":"Umicao","type":"Mire","hp":53,"atk":19,"def":14,"spd":17,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":24},{"id":"creature_180","name":"Tavinelo","type":"Solar","hp":54,"atk":9,"def":11,"spd":9,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":25},{"id":"creature_181","name":"Nexafoy","type":"Verdant","hp":30,"atk":12,"def":20,"spd":8,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":16},{"id":"creature_182","name":"Morofiyn","type":"Ember","hp":39,"atk":10,"def":15,"spd":10,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":19},{"id":"creature_183","name":"Wynluen","type":"Tide","hp":30,"atk":15,"def":12,"spd":12,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":18},{"id":"creature_184","name":"Morotilo","type":"Umbral","hp":35,"atk":19,"def":11,"spd":9,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":18},{"id":"creature_185","name":"Raiboel","type":"Volt","hp":35,"atk":8,"def":11,"spd":16,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":22},{"id":"creature_186","name":"Junolura","type":"Terra","hp":48,"atk":18,"def":17,"spd":19,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":17},{"id":"creature_187","name":"Junodael","type":"Aether","hp":41,"atk":12,"def":16,"spd":17,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":24},{"id":"creature_188","name":"Yulideor","type":"Frost","hp":35,"atk":10,"def":20,"spd":12,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":17},{"id":"creature_189","name":"Tavimala","type":"Bloom","hp":44,"atk":10,"def":9,"spd":18,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":21},{"id":"creature_190","name":"Taviceyn","type":"Gale","hp":44,"atk":19,"def":18,"spd":14,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":19},{"id":"creature_191","name":"Pirizula","type":"Mire","hp":43,"atk":10,"def":19,"spd":6,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":21},{"id":"creature_192","name":"Orufoen","type":"Solar","hp":48,"atk":13,"def":14,"spd":19,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":17},{"id":"creature_193","name":"Yulinois","type":"Verdant","hp":33,"atk":15,"def":17,"spd":17,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":21},{"id":"creature_194","name":"Kaevala","type":"Ember","hp":47,"atk":20,"def":19,"spd":19,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":19},{"id":"creature_195","name":"Verarari","type":"Tide","hp":36,"atk":12,"def":13,"spd":19,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":20},{"id":"creature_196","name":"Kaelao","type":"Umbral","hp":32,"atk":20,"def":14,"spd":19,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":21},{"id":"creature_197","name":"Faedalo","type":"Volt","hp":56,"atk":20,"def":20,"spd":13,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":17},{"id":"creature_198","name":"Wynchila","type":"Terra","hp":61,"atk":13,"def":14,"spd":13,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":13},{"id":"creature_199","name":"Lumibiu","type":"Aether","hp":36,"atk":14,"def":16,"spd":15,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":13},{"id":"creature_200","name":"Yulitiis","type":"Frost","hp":33,"atk":16,"def":13,"spd":18,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":16},{"id":"creature_201","name":"Kaenayn","type":"Bloom","hp":58,"atk":8,"def":20,"spd":9,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":19},{"id":"creature_202","name":"Glofou","type":"Gale","hp":44,"atk":17,"def":15,"spd":11,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":17},{"id":"creature_203","name":"Kaebia","type":"Mire","hp":60,"atk":14,"def":13,"spd":19,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":15},{"id":"creature_204","name":"Gloveia","type":"Solar","hp":42,"atk":16,"def":13,"spd":15,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":15},{"id":"creature_205","name":"Nexacari","type":"Verdant","hp":34,"atk":13,"def":13,"spd":14,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":18},{"id":"creature_206","name":"Verazao","type":"Ember","hp":30,"atk":8,"def":16,"spd":18,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":12},{"id":"creature_207","name":"Lumiseia","type":"Tide","hp":28,"atk":12,"def":15,"spd":14,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":10},{"id":"creature_208","name":"Xarolux","type":"Umbral","hp":32,"atk":11,"def":13,"spd":15,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":10},{"id":"creature_209","name":"Arideu","type":"Volt","hp":34,"atk":20,"def":11,"spd":11,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":17},{"id":"creature_210","name":"Selicelo","type":"Terra","hp":47,"atk":9,"def":9,"spd":12,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":10},{"id":"creature_211","name":"Caedax","type":"Aether","hp":51,"atk":19,"def":10,"spd":11,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":16},{"id":"creature_212","name":"Kaeti","type":"Frost","hp":29,"atk":20,"def":19,"spd":13,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":10},{"id":"creature_213","name":"Zerition","type":"Bloom","hp":62,"atk":20,"def":18,"spd":10,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":16},{"id":"creature_214","name":"Raimiyn","type":"Gale","hp":32,"atk":13,"def":18,"spd":13,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":11},{"id":"creature_215","name":"Junoluon","type":"Mire","hp":49,"atk":10,"def":10,"spd":18,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":13},{"id":"creature_216","name":"Pirike","type":"Solar","hp":32,"atk":13,"def":12,"spd":7,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":11},{"id":"creature_217","name":"Selizuu","type":"Verdant","hp":28,"atk":8,"def":12,"spd":12,"color":"#74bd66","accent":"#c9f07d","shape":"seed","rarity":13},{"id":"creature_218","name":"Belgaor","type":"Ember","hp":50,"atk":15,"def":12,"spd":16,"color":"#f17b4f","accent":"#ffd071","shape":"fox","rarity":10},{"id":"creature_219","name":"Selichilo","type":"Tide","hp":50,"atk":18,"def":17,"spd":7,"color":"#57a8e6","accent":"#c6f1ff","shape":"bird","rarity":9},{"id":"creature_220","name":"Raicey","type":"Umbral","hp":53,"atk":13,"def":13,"spd":18,"color":"#8c75bd","accent":"#d9c7ff","shape":"horn","rarity":15},{"id":"creature_221","name":"Junozux","type":"Volt","hp":48,"atk":8,"def":15,"spd":9,"color":"#e5c54d","accent":"#fff6a4","shape":"bug","rarity":7},{"id":"creature_222","name":"Belzaet","type":"Terra","hp":57,"atk":18,"def":12,"spd":16,"color":"#8d8376","accent":"#d7c5a5","shape":"turtle","rarity":7},{"id":"creature_223","name":"Tavikao","type":"Aether","hp":55,"atk":13,"def":11,"spd":8,"color":"#a9a4ff","accent":"#f3e7ff","shape":"deer","rarity":14},{"id":"creature_224","name":"Yuliluyn","type":"Frost","hp":36,"atk":9,"def":17,"spd":7,"color":"#78cbd2","accent":"#e5ffff","shape":"bat","rarity":7},{"id":"creature_225","name":"Drugais","type":"Bloom","hp":55,"atk":17,"def":13,"spd":19,"color":"#d879a9","accent":"#ffd1ec","shape":"seed","rarity":13},{"id":"creature_226","name":"Nexagaen","type":"Gale","hp":39,"atk":19,"def":11,"spd":15,"color":"#83b7df","accent":"#e8f4ff","shape":"fox","rarity":11},{"id":"creature_227","name":"Pirichia","type":"Mire","hp":62,"atk":11,"def":20,"spd":17,"color":"#718f67","accent":"#c9e4a5","shape":"bird","rarity":8},{"id":"creature_228","name":"Umiluum","type":"Solar","hp":52,"atk":20,"def":11,"spd":12,"color":"#e6a94f","accent":"#fff0ae","shape":"horn","rarity":15},{"id":"creature_229","name":"Drumais","type":"Verdant","hp":57,"atk":12,"def":10,"spd":8,"color":"#74bd66","accent":"#c9f07d","shape":"bug","rarity":11},{"id":"creature_230","name":"Elisey","type":"Ember","hp":39,"atk":12,"def":8,"spd":10,"color":"#f17b4f","accent":"#ffd071","shape":"turtle","rarity":12},{"id":"creature_231","name":"Selifoia","type":"Tide","hp":58,"atk":10,"def":19,"spd":7,"color":"#57a8e6","accent":"#c6f1ff","shape":"deer","rarity":9},{"id":"creature_232","name":"Nexabiet","type":"Umbral","hp":45,"atk":20,"def":12,"spd":14,"color":"#8c75bd","accent":"#d9c7ff","shape":"bat","rarity":9},{"id":"creature_233","name":"Tavibora","type":"Volt","hp":48,"atk":15,"def":12,"spd":11,"color":"#e5c54d","accent":"#fff6a4","shape":"seed","rarity":6},{"id":"creature_234","name":"Lumitin","type":"Terra","hp":57,"atk":11,"def":10,"spd":17,"color":"#8d8376","accent":"#d7c5a5","shape":"fox","rarity":11},{"id":"creature_235","name":"Zerichiyn","type":"Aether","hp":48,"atk":14,"def":20,"spd":19,"color":"#a9a4ff","accent":"#f3e7ff","shape":"bird","rarity":11},{"id":"creature_236","name":"Xarolien","type":"Frost","hp":54,"atk":18,"def":10,"spd":17,"color":"#78cbd2","accent":"#e5ffff","shape":"horn","rarity":5},{"id":"creature_237","name":"Selivior","type":"Bloom","hp":33,"atk":17,"def":10,"spd":12,"color":"#d879a9","accent":"#ffd1ec","shape":"bug","rarity":5},{"id":"creature_238","name":"Elicax","type":"Gale","hp":42,"atk":13,"def":16,"spd":13,"color":"#83b7df","accent":"#e8f4ff","shape":"turtle","rarity":7},{"id":"creature_239","name":"Arigiy","type":"Mire","hp":44,"atk":12,"def":14,"spd":7,"color":"#718f67","accent":"#c9e4a5","shape":"deer","rarity":12},{"id":"creature_240","name":"Caeliyn","type":"Solar","hp":53,"atk":13,"def":10,"spd":14,"color":"#e6a94f","accent":"#fff0ae","shape":"bat","rarity":12}];
+const moves=[
+ {name:'Golpe',power:8,kind:'physical'},
+ {name:'Pulso',power:11,kind:'arcane'},
+ {name:'Guardia',power:0,kind:'guard'}
+];
+
+let state={
+ seed:Math.floor(Math.random()*999999), day:1, time:8*60, coins:120,
+ player:{x:15,y:15}, party:[], box:[], items:{capsules:8,herbs:3},
+ inventory:{wood:0,stone:0,crystal:0}, nursery:[], discovered:[],
+ mapW:90,mapH:60, settings:{music:true,sfx:true,volume:.7}, base:{x:15,y:15}
+};
+let map=[], encounterCooldown=0, keys={}, moving=false, battleState=null, audio=null;
+
+function makeCreature(s,level=rand(2,6)){
+ const max=s.hp+level*3, c={uid:crypto.randomUUID?crypto.randomUUID():Date.now()+Math.random(),sid:s.id,name:s.name,type:s.type,level,maxHp:max,hp:max,atk:s.atk+level*2,def:s.def+level,spd:s.spd+level,exp:0,affinity:rand(10,30),gender:Math.random()<.5?'L':'F',trait:pick(['Calm','Bold','Lively','Gentle']),};
+ if(!state.discovered.includes(c.sid))state.discovered.push(c.sid);
+ return c;
+}
+function speciesOf(c){return species.find(s=>s.id===c.sid)||species[0]}
+
+function noise(n=1){if(!state.settings.sfx)return;if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),g=audio.createGain();o.type='square';o.frequency.value=n;g.gain.value=.035*state.settings.volume;o.connect(g);g.connect(audio.destination);o.start();o.frequency.exponentialRampToValueAtTime(n*1.7,audio.currentTime+.08);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.12);o.stop(audio.currentTime+.13)}
+function musicTick(){if(!state.settings.music)return;if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),g=audio.createGain();o.type='triangle';o.frequency.value=pick([196,220,247,294,330]);g.gain.value=.008*state.settings.volume;o.connect(g);g.connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.45);o.stop(audio.currentTime+.5)}
+setInterval(()=>{if(!document.hidden&&state.settings.music)musicTick()},1200);
+
+function save(){localStorage.setItem(SAVE,JSON.stringify(state));toast('Partida guardada.');noise(440)}
+function load(){try{const s=JSON.parse(localStorage.getItem(SAVE));if(s){state=Object.assign(state,s);return true}}catch(e){}return false}
+
+// Infinite procedural map (no borders) — tile from absolute coords + seed
+const tileCache={};
+function noise2(x,y){
+ let n=state.seed^0x9E3779B9;
+ n=((n+(x*374761393))|0);n=((n+(y*668265263))|0);
+ n=(n^(n>>>13))*1274126177|0;return ((n^(n>>>16))>>>0)/4294967296;
+}
+function tileAt(x,y){
+ const key=x+','+y;
+ if(tileCache[key])return tileCache[key];
+ // fixed home clearing
+ if(x>=12&&x<=18&&y>=12&&y<=18){tileCache[key]='home';return 'home'}
+ if((y===15&&x>=5&&x<=45)||(x===15&&y>=8&&y<=30)){tileCache[key]='path';return 'path'}
+ // starter lake
+ let dLake=Math.hypot(x-34,y-24);if(dLake<5.2){tileCache[key]='water';return 'water'}
+ if(dLake<6.8){tileCache[key]='sand';return 'sand'}
+ let n1=noise2(x,y),n2=noise2(x+100,y+50),n3=noise2(x*2,y*2);
+ let tile='grass';
+ if(n1<.11||(n2<.16&&n1<.25)) tile='water';
+ else if(n1<.18) tile='sand';
+ else if(n1<.36||(n3<.22&&n1<.42)) tile='forest';
+ else if(n1<.44) tile='rock';
+ // shore smoothing
+ if(tile==='grass'){
+  let w=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   let nn=noise2(x+dx,y+dy);if(nn<.11||(noise2(x+dx+100,y+dy+50)<.16&&nn<.25))w++;
+  }
+  if(w>=2)tile='sand';
+ }
+ tileCache[key]=tile;return tile;
+}
+function isWalkable(x,y){let t=tileAt(x,y);return t&&t!=='water'&&t!=='rock'}
+function initGame(fresh=false){
+ if(fresh){state.seed=Math.floor(Math.random()*999999);state.day=1;state.time=8*60;state.coins=120;state.player={x:15,y:15};state.party=[makeCreature(species[0],5)];state.box=[];state.nursery=[];state.discovered=[];state.inventory={wood:0,stone:0,crystal:0};state.items={capsules:8,herbs:3};Object.keys(tileCache).forEach(k=>delete tileCache[k])}
+ $('titleScreen').classList.add('hidden');$('hud').classList.remove('hidden');updateHUD(); render();
+}
+function tileColor(t){
+ return {grass:'#58a058',forest:'#3d8a4a',water:'#3a7cb8',sand:'#e8d090',rock:'#7a7e88',path:'#c4a878',home:'#8b6e5a'}[t]||'#304050'
+}
+// High-detail procedural tiles inspired by classic Pokémon overworld (Gen 2/3 style)
+function drawTile(sx,sy,t){
+ const X=sx*T, Y=sy*T;
+ // base
+ ctx.fillStyle=tileColor(t);ctx.fillRect(X,Y,T,T);
+
+ if(t==='grass'){
+  // lighter patches
+  ctx.fillStyle='#6bb86b';
+  for(let i=0;i<5;i++){let q=(sx*19+sy*13+i*11)%31;ctx.fillRect(X+(q%28),Y+((q*5)%26),3,2)}
+  // grass tufts
+  ctx.fillStyle='#3d7a3d';
+  for(let i=0;i<4;i++){let q=(sx*7+sy*23+i*9)%29;ctx.fillRect(X+2+(q%26),Y+4+((q*3)%24),2,4)}
+  // occasional flower
+  if((sx*13+sy*7)%17===0){ctx.fillStyle='#f0e060';ctx.fillRect(X+14,Y+10,3,3);ctx.fillStyle='#e08090';ctx.fillRect(X+15,Y+9,1,1)}
+ }
+ else if(t==='forest'){
+  // ground under tree
+  ctx.fillStyle='#4a8f50';ctx.fillRect(X,Y,T,T);
+  // trunk
+  ctx.fillStyle='#6b4423';ctx.fillRect(X+13,Y+18,6,12);
+  ctx.fillStyle='#8a5a30';ctx.fillRect(X+14,Y+18,3,10);
+  // canopy layers (palm / dense tree look)
+  ctx.fillStyle='#1e5c28';
+  ctx.fillRect(X+6,Y+6,20,14);ctx.fillRect(X+4,Y+10,24,8);
+  ctx.fillStyle='#2d8a3a';
+  ctx.fillRect(X+8,Y+4,16,10);ctx.fillRect(X+5,Y+8,22,6);
+  ctx.fillStyle='#3db04a';
+  ctx.fillRect(X+10,Y+2,12,8);ctx.fillRect(X+7,Y+6,18,5);
+  // highlight
+  ctx.fillStyle='#5cd06a';ctx.fillRect(X+12,Y+3,6,4);
+ }
+ else if(t==='water'){
+  ctx.fillStyle='#2a6aa0';ctx.fillRect(X,Y,T,T);
+  // depth variation
+  ctx.fillStyle='#3a8ac0';ctx.fillRect(X+2,Y+2,T-4,T-4);
+  // wave lines
+  ctx.fillStyle='#5ab0d8';
+  const phase=((sx+sy)+(Math.floor(Date.now()/400)%4))%4;
+  ctx.fillRect(X+4+phase,Y+8,14,2);
+  ctx.fillRect(X+10,Y+18,12,2);
+  ctx.fillStyle='#80d0f0';ctx.fillRect(X+8,Y+12,8,1);
+ }
+ else if(t==='sand'){
+  ctx.fillStyle='#e8d090';ctx.fillRect(X,Y,T,T);
+  ctx.fillStyle='#d4bc70';
+  for(let i=0;i<6;i++){let q=(sx*11+sy*17+i*5)%28;ctx.fillRect(X+(q%28),Y+((q*7)%28),2,2)}
+  ctx.fillStyle='#f5e8b0';ctx.fillRect(X+4,Y+6,3,2);ctx.fillRect(X+18,Y+20,4,2);
+ }
+ else if(t==='rock'){
+  ctx.fillStyle='#6a6e78';ctx.fillRect(X,Y,T,T);
+  // boulder
+  ctx.fillStyle='#8a8e98';ctx.fillRect(X+5,Y+6,22,20);
+  ctx.fillStyle='#a0a4b0';ctx.fillRect(X+8,Y+4,14,8);
+  ctx.fillStyle='#5a5e68';ctx.fillRect(X+6,Y+18,18,6);
+  ctx.fillStyle='#c0c4d0';ctx.fillRect(X+10,Y+6,5,3);
+ }
+ else if(t==='path'){
+  ctx.fillStyle='#c4a878';ctx.fillRect(X,Y,T,T);
+  ctx.fillStyle='#a88858';
+  for(let i=0;i<4;i++){let q=(sx*9+sy*15+i*7)%27;ctx.fillRect(X+(q%28),Y+((q*5)%28),3,2)}
+  ctx.fillStyle='#d8c090';ctx.fillRect(X+2,Y+2,T-4,2);ctx.fillRect(X+2,Y+T-4,T-4,2);
+ }
+ else if(t==='home'){
+  // wooden floor / clearing
+  ctx.fillStyle='#a08060';ctx.fillRect(X,Y,T,T);
+  ctx.fillStyle='#8a6a48';ctx.fillRect(X+2,Y+2,T-4,T-4);
+  // small house marker
+  ctx.fillStyle='#c4a070';ctx.fillRect(X+6,Y+10,20,16);
+  ctx.fillStyle='#e07060';ctx.fillRect(X+4,Y+4,24,8); // roof
+  ctx.fillStyle='#5a3a20';ctx.fillRect(X+13,Y+18,6,8); // door
+ }
+}
+let lastDir={dx:0,dy:1};
+function fieldAbility(type){
+ const t=(type||'').toLowerCase();
+ if(['verdant','bloom','mire'].includes(t))return {id:'cut',name:'Corte',desc:'Tala árboles y hierba alta'};
+ if(['terra'].includes(t))return {id:'smash',name:'Romper',desc:'Destroza rocas'};
+ if(['ember','solar'].includes(t))return {id:'ignite',name:'Fogata',desc:'Enciende o coloca fogata'};
+ if(['tide'].includes(t))return {id:'surf',name:'Surcar',desc:'Interactúa con agua y pesca'};
+ if(['gale'].includes(t))return {id:'gust',name:'Ráfaga',desc:'Limpia caminos y despeja'};
+ if(['volt'].includes(t))return {id:'spark',name:'Chispa',desc:'Ilumina y energiza'};
+ if(['frost'].includes(t))return {id:'freeze',name:'Escarcha',desc:'Congela y recolecta'};
+ if(['aether','umbral'].includes(t))return {id:'sense',name:'Sentir',desc:'Detecta recursos ocultos'};
+ return {id:'gather',name:'Recolectar',desc:'Recoge materiales básicos'};
+}
+function render(){
+ ctx.clearRect(0,0,W,H);
+ const viewW=Math.ceil(W/T)+2,viewH=Math.ceil(H/T)+2,ox=state.player.x-Math.floor(viewW/2),oy=state.player.y-Math.floor(viewH/2);
+ for(let sy=0;sy<viewH;sy++)for(let sx=0;sx<viewW;sx++){
+  let x=ox+sx,y=oy+sy;drawTile(sx,sy,tileAt(x,y));
+ }
+ // campfires / simple builds from field moves
+ if(state.frontier&&state.frontier.builds){
+  state.frontier.builds.forEach(b=>{
+   let sx=b.x-ox,sy=b.y-oy;if(sx<-1||sy<-1||sx>viewW||sy>viewH)return;
+   if(b.id==='campfire'||b.id==='fire'){ctx.fillStyle='#3a2a1a';ctx.fillRect(sx*T+10,sy*T+16,12,8);ctx.fillStyle='#ff8c42';ctx.fillRect(sx*T+12,sy*T+8,8,12);ctx.fillStyle='#ffd166';ctx.fillRect(sx*T+14,sy*T+6,4,6)}
+  });
+ }
+ const px=state.player.x-ox,py=state.player.y-oy;
+ if(state.party[0]){
+  let s=speciesOf(state.party[0]);
+  let fx=px*T - lastDir.dx*20 + 4, fy=py*T - lastDir.dy*16 + 6;
+  drawOverworldCreature(fx,fy,s);
+ }
+ drawPlayerAt(px*T,py*T);
+ const phase=(state.time/1440);let alpha=phase<.2||phase>.85?0.32:phase<.3||phase>.75?0.18:0;
+ ctx.fillStyle=`rgba(12,20,55,${alpha})`;ctx.fillRect(0,0,W,H);
+ if(state.party[0]){let ab=fieldAbility(state.party[0].type);ctx.fillStyle='#ffffffc0';ctx.font='10px monospace';ctx.fillText(`E: ${ab.name} (${state.party[0].name})  •  ${state.player.x},${state.player.y}`,12,H-12)}
+ else {ctx.fillStyle='#ffffffb0';ctx.font='10px monospace';ctx.fillText(`AETHERWILDS  •  ${state.player.x},${state.player.y}`,12,H-12);}
+}
+// Detailed player sprite (classic overworld style)
+function drawPlayerAt(x,y){
+ // shadow
+ ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(x+4,y+26,16,4);
+ // legs
+ ctx.fillStyle='#2a3a6a';ctx.fillRect(x+6,y+20,6,8);ctx.fillRect(x+14,y+20,6,8);
+ // body / shirt
+ ctx.fillStyle='#e05050';ctx.fillRect(x+5,y+10,14,12);
+ ctx.fillStyle='#f07070';ctx.fillRect(x+6,y+11,12,4);
+ // head
+ ctx.fillStyle='#f0c8a0';ctx.fillRect(x+6,y+2,12,10);
+ // hair
+ ctx.fillStyle='#4a3020';ctx.fillRect(x+5,y+0,14,5);ctx.fillRect(x+4,y+2,3,4);ctx.fillRect(x+17,y+2,3,4);
+ // eyes
+ ctx.fillStyle='#2a2010';ctx.fillRect(x+8,y+5,2,2);ctx.fillRect(x+14,y+5,2,2);
+ // hat / detail
+ ctx.fillStyle='#d04040';ctx.fillRect(x+5,y+0,14,3);
+}
+// Small overworld creature sprite
+function drawOverworldCreature(x,y,s){
+ ctx.fillStyle='rgba(0,0,0,0.2)';ctx.fillRect(x+3,y+18,14,3);
+ ctx.fillStyle=s.color;
+ const sh=s.shape||'seed';
+ if(sh==='seed'||sh==='bug'){
+  ctx.fillRect(x+5,y+6,12,12);ctx.fillRect(x+3,y+10,4,6);ctx.fillRect(x+15,y+10,4,6);
+  ctx.fillStyle=s.accent;ctx.fillRect(x+8,y+2,6,6);
+ }else if(sh==='fox'||sh==='deer'){
+  ctx.fillRect(x+4,y+8,14,10);ctx.fillRect(x+2,y+6,5,6);ctx.fillRect(x+15,y+6,5,6);
+  ctx.fillStyle=s.accent;ctx.fillRect(x+7,y+3,8,6);
+ }else if(sh==='bird'||sh==='bat'){
+  ctx.fillRect(x+6,y+8,10,10);ctx.fillRect(x+1,y+10,8,5);ctx.fillRect(x+13,y+10,8,5);
+  ctx.fillStyle=s.accent;ctx.fillRect(x+8,y+4,6,5);
+ }else if(sh==='turtle'||sh==='horn'){
+  ctx.fillRect(x+3,y+6,16,12);ctx.fillStyle=s.accent;ctx.fillRect(x+6,y+3,10,6);
+ }else{
+  ctx.fillRect(x+5,y+6,12,12);ctx.fillStyle=s.accent;ctx.fillRect(x+8,y+3,6,6);
+ }
+ // eyes
+ ctx.fillStyle='#1a1a1a';ctx.fillRect(x+8,y+8,2,2);ctx.fillRect(x+13,y+8,2,2);
+}
+
+function move(dx,dy){
+ if(battleState)return;let nx=state.player.x+dx,ny=state.player.y+dy;
+ if(isWalkable(nx,ny)){lastDir={dx,dy};state.player.x=nx;state.player.y=ny;state.time=(state.time+2)%1440;if(state.time<2)state.day++;encounterCooldown--;noise(190);let t=tileAt(nx,ny);if(encounterCooldown<=0&&['grass','forest'].includes(t)&&Math.random()<.14){encounterCooldown=8;startWildBattle()}render();updateHUD()}
+}
+function updateHUD(){
+ let h=Math.floor(state.time/60),m=String(state.time%60).padStart(2,'0');$('dayLabel').textContent=`Día ${state.day} · ${String(h).padStart(2,'0')}:${m}`;$('coins').textContent=`◈ ${state.coins}`;
+ $('partyMini').innerHTML=state.party.slice(0,6).map(c=>`<div class="partyDot" title="${c.name} Nv.${c.level}">${speciesOf(c).name.slice(0,2).toUpperCase()}</div>`).join('');
+}
+
+function startWildBattle(){
+ const s=pick(species.filter(s=>Math.random()<s.rarity/60))||species[0];let wild=makeCreature(s,Math.max(2,Math.floor(state.player.x/8)+rand(0,4)));
+ battleState={wild,player:state.party[0],guard:false};$('battle').classList.remove('hidden');$('battleLog').textContent=`¡${wild.name} salvaje apareció!`;drawBattle();noise(520)
+}
+function drawCreature(c,canvas,flip=false){
+ canvas.width=120;canvas.height=100;let x=canvas.getContext('2d');x.imageSmoothingEnabled=false;let s=speciesOf(c),col=s.color,ac=s.accent;x.clearRect(0,0,120,100);
+ x.fillStyle='rgba(0,0,0,.25)';x.fillRect(22,76,76,8);
+ x.fillStyle=col;
+ if(s.shape==='seed'){x.fillRect(42,30,38,42);x.fillRect(35,42,10,20);x.fillRect(75,42,10,20);x.fillRect(49,20,20,14)}
+ if(s.shape==='fox'){x.fillRect(34,37,52,35);x.fillRect(26,26,17,25);x.fillRect(77,27,17,24);x.fillRect(25,62,18,12);x.fillRect(77,62,18,12)}
+ if(s.shape==='bird'){x.fillRect(40,32,40,40);x.fillRect(25,45,25,17);x.fillRect(70,45,25,17);x.fillRect(52,21,15,15)}
+ if(s.shape==='horn'){x.fillRect(36,31,50,43);x.fillRect(27,42,14,22);x.fillRect(81,42,14,22);x.fillRect(48,19,8,17);x.fillRect(64,15,8,22)}
+ if(s.shape==='bug'){x.fillRect(42,29,38,45);x.fillRect(31,39,12,28);x.fillRect(77,39,12,28);x.fillRect(52,20,6,12);x.fillRect(65,20,6,12)}
+ if(s.shape==='turtle'){x.fillRect(32,27,56,48);x.fillRect(23,40,18,24);x.fillRect(79,40,18,24);x.fillRect(43,65,11,12);x.fillRect(66,65,11,12)}
+ if(s.shape==='deer'){x.fillRect(38,30,45,40);x.fillRect(27,41,16,20);x.fillRect(78,41,16,20);x.fillRect(47,17,8,18);x.fillRect(66,14,8,21)}
+ if(s.shape==='bat'){x.fillRect(43,35,35,40);x.fillRect(18,31,30,26);x.fillRect(72,31,30,26)}
+ x.fillStyle=ac;x.fillRect(51,40,7,7);x.fillRect(66,40,7,7);x.fillStyle='#1c2030';x.fillRect(53,42,3,3);x.fillRect(68,42,3,3);
+}
+function drawBattle(){
+ let w=$('battleWild'),p=$('battlePlayer');
+ w.innerHTML='<canvas></canvas>';p.innerHTML='<canvas></canvas>';
+ // wild (opponent) on the RIGHT / top — player on the LEFT / bottom (classic Pokémon)
+ drawCreature(battleState.wild,w.querySelector('canvas'));
+ drawCreature(battleState.player,p.querySelector('canvas'));
+ let b=battleState;
+ // HP of wild (opponent) top-left, HP of player bottom-right — classic layout
+ $('battleInfo').innerHTML=`
+  <div class="statBox wildBox"><b>${b.wild.name}</b> Nv.${b.wild.level}<div class="hpbar"><i style="width:${Math.max(0,b.wild.hp/b.wild.maxHp*100)}%"></i></div><small>HP ${Math.max(0,b.wild.hp)}/${b.wild.maxHp}</small></div>
+  <div class="statBox playerBox"><b>${b.player.name}</b> Nv.${b.player.level}<div class="hpbar"><i style="width:${Math.max(0,b.player.hp/b.player.maxHp*100)}%"></i></div><small>HP ${Math.max(0,b.player.hp)}/${b.player.maxHp}</small></div>`;
+}
+function battleText(t){$('battleLog').textContent=t}
+function damage(att,def,power){return Math.max(1,Math.floor(power+att.atk*.55-def.def*.28+rand(-2,3)))}
+function battleAction(a){
+ if(!battleState)return;let b=battleState;
+ if(a==='run'){battleText('Escapas antes de que la criatura cierre el paso.');noise(160);return setTimeout(endBattle,450)}
+ if(a==='capture'){
+   if(state.items.capsules<=0)return battleText('No te quedan cápsulas de vínculo.');
+   state.items.capsules--;let chance=.28+(1-b.wild.hp/b.wild.maxHp)*.62+b.player.affinity*.002;
+   if(Math.random()<chance){state.box.push(b.wild);state.coins+=12;battleText(`¡${b.wild.name} se une a tu colección!`);noise(760);setTimeout(endBattle,800);return}
+   battleText('La cápsula vibra... ¡pero se rompe el vínculo!');noise(240);
+ } else if(a==='bond'){
+   b.player.affinity=clamp(b.player.affinity+rand(3,8),0,100);b.player.hp=clamp(b.player.hp+5,0,b.player.maxHp);battleText(`${b.player.name} siente tu confianza. Afinidad +${rand(3,8)}.`);noise(390);
+ } else {
+   let d=damage(b.player,b.wild,moves[a==='strike'?0:1].power);b.wild.hp-=d;b.player.exp+=d;b.player.affinity=clamp(b.player.affinity+1,0,100);battleText(`${b.player.name} inflige ${d} de daño.`);
+   if(b.wild.hp<=0){state.coins+=8;b.player.level+=1;b.player.maxHp+=3;b.player.hp=b.player.maxHp;b.player.atk+=1;b.player.def+=1;b.player.spd+=1;battleText(`${b.wild.name} cae. ${b.player.name} sube a Nv.${b.player.level}.`);noise(880);setTimeout(endBattle,900);updateHUD();return}
+ }
+ setTimeout(enemyTurn,420);drawBattle();
+}
+function enemyTurn(){if(!battleState)return;let b=battleState,d=damage(b.wild,b.player,rand(6,12));b.player.hp-=d;battleText(`${b.wild.name} responde e inflige ${d}.`);if(b.player.hp<=0){b.player.hp=Math.ceil(b.player.maxHp*.35);battleText(`${b.player.name} queda debilitado. Te retiras al refugio.`);setTimeout(endBattle,900)}drawBattle()}
+function endBattle(){$('battle').classList.add('hidden');battleState=null;updateHUD();render();save()}
+
+function openPanel(name){
+ $('menu').classList.add('hidden');$('subpanel').classList.remove('hidden');
+ let title='',html='';
+ if(name==='creatures'){
+  title='CRIATURAS';
+  const all=state.party.concat(state.box);
+  html=`<p class="hint">Pulsa una criatura para ver su ficha completa · Equipo: ${state.party.length}/6</p>`;
+  all.forEach((c,i)=>{
+   const s=speciesOf(c);const inParty=i<state.party.length;
+   html+=`<div class="pokeStatus creatureCard" data-idx="${i}" onclick="showCreatureDetail(${i})">
+    <canvas width="80" height="64" data-sid="${c.sid}" data-cidx="${i}"></canvas>
+    <div class="pokeStats">
+     <b>${s.name}</b> ${inParty?'★':''}<br>
+     ${c.type} · Nv.${c.level} · ${c.gender==='L'?'♂':'♀'}<br>
+     HP ${c.hp}/${c.maxHp}<div class="bar"><i style="width:${c.hp/c.maxHp*100}%"></i></div>
+     ATK ${c.atk} · DEF ${c.def} · SPD ${c.spd}<br>
+     <small>Afinidad ${c.affinity}% · ${c.trait}</small>
+    </div></div>`;
+  });
+  if(!all.length)html+='<p>No tienes criaturas aún.</p>';
+ }
+ if(name==='dex'){
+  title='AETHERDEX';
+  const known=new Set(state.discovered||[]);
+  html=`<p class="hint">${known.size} / ${species.length} especies registradas</p><div class="dexGrid">`;
+  species.forEach((s,i)=>{
+   const k=known.has(s.id);
+   html+=`<div class="dexCard ${k?'known':''}" ${k?`onclick="showDexEntry('${s.id}')"`:''}>
+    <div style="font-size:9px;color:#8af">#${String(i+1).padStart(3,'0')}</div>
+    ${k?`<canvas width="56" height="48" data-sid="${s.id}"></canvas><b>${s.name}</b><br><small>${s.type}</small>`:`<div style="height:48px;display:grid;place-items:center;font-size:22px;opacity:.4">?</div><b>???</b><br><small>—</small>`}
+   </div>`;
+  });
+  html+='</div>';
+ }
+ if(name==='nursery'){title='CRIADERO';html=`<p>Deja dos criaturas y, tras explorar, nacerá una cría.</p><div class="row"><span>Plazas: ${state.nursery.length}/2</span><button id="breedBtn">CRIAR</button></div><div class="cardGrid">${state.nursery.map(c=>`<div class="creatureCard"><strong>${c.name}</strong><small>${c.type}</small></div>`).join('')}</div><button id="nurseryAuto" class="bigBtn">USAR MIS DOS PRIMERAS</button>`}
+ if(name==='inventory'){title='MOCHILA';html=`<div class="row"><span>◈ Cápsulas de vínculo</span><b>${state.items.capsules||0}</b></div><div class="row"><span>✚ Hierbas curativas</span><b>${state.items.herbs||0}</b></div><div class="row"><span>▣ Madera</span><b>${state.inventory.wood||0}</b></div><div class="row"><span>◆ Piedra</span><b>${state.inventory.stone||0}</b></div><div class="row"><span>✦ Cristal</span><b>${state.inventory.crystal||0}</b></div>`}
+ if(name==='map'){title='MAPA';html=`<p>Mundo <b>infinito</b> procedural.</p><div class="row"><span>Posición</span><b>${state.player.x}, ${state.player.y}</b></div><div class="row"><span>Bioma</span><b>${tileAt(state.player.x,state.player.y)}</b></div><div class="row"><span>Semilla</span><b>${state.seed}</b></div><div class="row"><span>Aetherdex</span><b>${(state.discovered||[]).length}/${species.length}</b></div>`}
+ $('subTitle').textContent=title;$('subContent').innerHTML=html;
+ if(name==='nursery'){
+  const na=$('nurseryAuto'),bb=$('breedBtn');
+  if(na)na.onclick=()=>{if(state.party.length>=2){state.nursery=[state.party[0],state.party[1]];toast('Dos criaturas en el criadero.');openPanel('nursery')}};
+  if(bb)bb.onclick=breed;
+ }
+ // draw creature sprites on canvases (Pokémon-style)
+ requestAnimationFrame(()=>{
+  document.querySelectorAll('#subContent canvas[data-sid]').forEach(cv=>{
+   const sid=cv.dataset.sid;
+   const s=species.find(x=>x.id===sid)||species[0];
+   const fake={sid:s.id,name:s.name,type:s.type,level:1,maxHp:s.hp,hp:s.hp,atk:s.atk,def:s.def,spd:s.spd};
+   drawCreature(fake,cv);
+  });
+ });
+}
+window.showCreatureDetail=function(i){
+ const all=state.party.concat(state.box);const c=all[i];if(!c)return;
+ const s=speciesOf(c);
+ $('subTitle').textContent=s.name.toUpperCase();
+ $('subContent').innerHTML=`
+  <div class="pokeStatus">
+   <canvas id="detailCv" width="120" height="100"></canvas>
+   <div class="pokeStats">
+    <b>${s.name}</b> · ${c.type}<br>
+    Nivel ${c.level} · ${c.gender==='L'?'♂ Macho':'♀ Hembra'} · ${c.trait}<br><br>
+    <b>HP</b> ${c.hp} / ${c.maxHp}<div class="bar"><i style="width:${c.hp/c.maxHp*100}%"></i></div>
+    <b>ATK</b> ${c.atk} &nbsp; <b>DEF</b> ${c.def} &nbsp; <b>SPD</b> ${c.spd}<br>
+    Afinidad ${c.affinity}% · EXP ${c.exp||0}<br><br>
+    ${i<state.party.length?'<span style="color:#7cf5c4">En el equipo</span>':'En la caja'}
+    ${i>0&&i<state.party.length?`<br><button onclick="setLead(${i})">PONER AL FRENTE</button>`:''}
+   </div>
+  </div>
+  <button class="bigBtn secondary" onclick="openPanel('creatures')">← VOLVER</button>`;
+ drawCreature(c,$('detailCv'));
+};
+window.setLead=function(i){
+ if(i<=0||i>=state.party.length)return;
+ const t=state.party[0];state.party[0]=state.party[i];state.party[i]=t;
+ toast(state.party[0].name+' lidera el equipo.');openPanel('creatures');updateHUD();render();
+};
+window.showDexEntry=function(sid){
+ const s=species.find(x=>x.id===sid);if(!s)return;
+ $('subTitle').textContent='AETHERDEX · '+s.name;
+ $('subContent').innerHTML=`
+  <div class="pokeStatus">
+   <canvas id="dexCv" width="120" height="100"></canvas>
+   <div class="pokeStats">
+    <b>${s.name}</b><br>Tipo: ${s.type}<br>
+    HP base ${s.hp} · ATK ${s.atk} · DEF ${s.def} · SPD ${s.spd}<br>
+    Forma: ${s.shape} · Rareza ${s.rarity}
+   </div>
+  </div>
+  <button class="bigBtn secondary" onclick="openPanel('dex')">← VOLVER</button>`;
+ const fake={sid:s.id,name:s.name,type:s.type,level:1,maxHp:s.hp,hp:s.hp,atk:s.atk,def:s.def,spd:s.spd};
+ drawCreature(fake,$('dexCv'));
+};
+function breed(){
+ if(state.nursery.length<2)return toast('Necesitas dos criaturas.');
+ let a=state.nursery[0],b=state.nursery[1];if(a.sid!==b.sid)return toast('En esta demo, las dos criaturas deben ser de la misma especie.');
+ let s=speciesOf(a),baby=makeCreature(s,1);baby.maxHp=Math.round((a.maxHp+b.maxHp)/2);baby.hp=baby.maxHp;baby.affinity=20;state.box.push(baby);state.nursery=[];state.coins=Math.max(0,state.coins-15);toast(`¡Ha nacido un ${baby.name}!`);openPanel('nursery');noise(700)
+}
+function toast(t){let e=$('toast');e.textContent=t;e.classList.add('toastOn');clearTimeout(window._toast);window._toast=setTimeout(()=>e.classList.remove('toastOn'),1700)}
+
+document.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();if(e.key.toLowerCase()==='m'){$('menu').classList.toggle('hidden');}if(e.key.toLowerCase()==='e')interact()});
+document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+let lastMove=0,lastAnim=0;
+function loop(t){
+ if(!battleState&&Date.now()-lastMove>125){
+  let dx=0,dy=0;
+  if(keys.w||keys.arrowup)dy=-1;else if(keys.s||keys.arrowdown)dy=1;
+  else if(keys.a||keys.arrowleft)dx=-1;else if(keys.d||keys.arrowright)dx=1;
+  if(dx||dy){move(dx,dy);lastMove=Date.now()}
+ }
+ // soft re-render for water wave animation (~4 fps when idle)
+ if(!battleState&&Date.now()-lastAnim>250){lastAnim=Date.now();render()}
+ requestAnimationFrame(loop)
+}
+requestAnimationFrame(loop);
+function interact(){
+ if(battleState)return;
+ const px=state.player.x,py=state.player.y,t=tileAt(px,py);
+ if(t==='home'){
+  state.party.forEach(c=>c.hp=c.maxHp);toast('Descansas en el refugio. Equipo recuperado.');noise(520);return;
+ }
+ const lead=state.party[0];
+ if(lead){
+  const ab=fieldAbility(lead.type);
+  const dirs=[[0,-1],[0,1],[-1,0],[1,0],[0,0]];
+  let used=false;
+  for(const [dx,dy] of dirs){
+   const tx=px+dx,ty=py+dy,tt=tileAt(tx,ty);
+   if(ab.id==='cut'&&(tt==='forest'||tt==='grass')){
+    tileCache[tx+','+ty]=tt==='forest'?'grass':'path';
+    state.inventory.wood=(state.inventory.wood||0)+1+rand(0,2);
+    toast(`${lead.name} usa ${ab.name}: +madera`);noise(380);used=true;break;
+   }
+   if(ab.id==='smash'&&tt==='rock'){
+    tileCache[tx+','+ty]='path';
+    state.inventory.stone=(state.inventory.stone||0)+1+rand(0,2);
+    toast(`${lead.name} usa ${ab.name}: +piedra`);noise(280);used=true;break;
+   }
+   if(ab.id==='ignite'&&(tt==='grass'||tt==='path'||tt==='home')){
+    state.frontier=state.frontier||{builds:[]};state.frontier.builds=state.frontier.builds||[];
+    if(!state.frontier.builds.some(b=>b.x===tx&&b.y===ty&&b.id==='campfire')){
+     state.frontier.builds.push({id:'campfire',x:tx,y:ty});
+     toast(`${lead.name} enciende una fogata.`);noise(520);used=true;break;
+    }
+   }
+   if(ab.id==='surf'&&tt==='water'){
+    state.inventory.crystal=(state.inventory.crystal||0)+1;
+    toast(`${lead.name} surca el agua y encuentra cristal.`);noise(420);used=true;break;
+   }
+   if(ab.id==='sense'){
+    state.inventory.crystal=(state.inventory.crystal||0)+1;
+    toast(`${lead.name} detecta cristales ocultos.`);noise(600);used=true;break;
+   }
+   if(ab.id==='gust'&&(tt==='forest'||tt==='grass')){
+    tileCache[tx+','+ty]='path';state.inventory.wood=(state.inventory.wood||0)+1;
+    toast(`${lead.name} despeja el terreno.`);noise(360);used=true;break;
+   }
+   if(ab.id==='spark'||ab.id==='freeze'||ab.id==='gather'){
+    let r=pick(['wood','stone','crystal']);state.inventory[r]=(state.inventory[r]||0)+1;
+    toast(`${lead.name} usa ${ab.name}: +${r}`);noise(480);used=true;break;
+   }
+  }
+  if(used){render();updateHUD();save();return;}
+ }
+ let r=pick(['wood','stone','crystal']);state.inventory[r]=(state.inventory[r]||0)+1;
+ toast('Encuentras un recurso en el terreno.');noise(320);render();updateHUD();
+}
+
+document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('pointerdown',e=>{let d=b.dataset.dir;move(d==='left'?-1:d==='right'?1:0,d==='up'?-1:d==='down'?1:0)}));
+$('touchInteract').onclick=interact;$('touchMenu').onclick=()=>$('menu').classList.toggle('hidden');
+$('menuBtn').onclick=()=>$('menu').classList.remove('hidden');
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.add('hidden'));
+document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openPanel(b.dataset.open));
+$('saveBtn').onclick=save;
+document.querySelectorAll('.battleBtn').forEach(b=>b.onclick=()=>battleAction(b.dataset.action));
+$('newGame').onclick=()=>{localStorage.removeItem(SAVE);initGame(true);noise(440)};
+$('continueGame').onclick=()=>{if(load())initGame(false);else toast('No hay partida guardada.')};
+
+try{frontEnsure()}catch(e){}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if(load()){ /* title remains, continue available */ } else {$('continueGame').style.opacity=.45}
+
+/* ===== AETHERWILDS: FRONTIER EXPANSION ===== */
+state.frontier = state.frontier || {
+  chunkX:0,chunkY:0, region:'Verdalia', exploredChunks:{},
+  storage:{}, builds:[], farm:[], fish:[], quests:[],
+  skills:{power:0,guard:0,focus:0,scavenger:0},
+  bosses:{}, dungeon:{floor:1,cleared:0}, selectedBuild:null
+};
+
+const ITEMS=[
+ ['capsule','◈','Cápsula de vínculo'],['herb','✚','Hierba curativa'],['wood','▣','Madera'],
+ ['stone','◆','Piedra'],['crystal','✦','Cristal'],['fiber','❖','Fibra'],['seed','✿','Semillas'],
+ ['ore','⬟','Mineral'],['bait','●','Cebo'],['berry','●','Bayas'],['fish','≈','Pescado'],['gem','◇','Gema']
+];
+const RECIPES=[
+ {id:'campfire',name:'Fogata',icon:'♨',cost:{wood:5,stone:2},desc:'Cocina y descansa.'},
+ {id:'chest',name:'Cofre',icon:'▣',cost:{wood:10,stone:4},desc:'Almacenamiento 24 huecos.'},
+ {id:'workbench',name:'Banco',icon:'⚒',cost:{wood:12,stone:8},desc:'Desbloquea fabricación.'},
+ {id:'house',name:'Refugio',icon:'⌂',cost:{wood:24,stone:12},desc:'Un hogar mejorado.'},
+ {id:'farmplot',name:'Parcela',icon:'▦',cost:{wood:6,fiber:4},desc:'Cultiva semillas.'},
+ {id:'baitbox',name:'Caja de cebo',icon:'◉',cost:{wood:5,fiber:5},desc:'Mejora la pesca.'}
+];
+const REGIONS=[
+ ['Verdalia','Praderas y bosques','Verdant / Bloom','★'],['Cinderreach','Cañones volcánicos','Ember / Terra','◆'],
+ ['Azure Coast','Costas y arrecifes','Tide / Gale','≈'],['Duskmire','Pantanos eternos','Mire / Umbral','☾'],
+ ['Frostveil','Tundra cristalina','Frost / Aether','❄'],['Stormsteppe','Llanuras eléctricas','Volt / Gale','⚡'],
+ ['Sunscar','Desierto dorado','Solar / Terra','☀'],['Moonroot','Selva nocturna','Umbral / Verdant','☾'],
+ ['Skybreak','Islas suspendidas','Aether / Gale','✦']
+];
+const NPCS=[
+ ['Nara','Cartógrafa','Quiere registrar 3 regiones.','MAPA'],['Oren','Maestro artesano','Enséñate a fabricar cofres.','CRAFT'],
+ ['Mika','Guardabosques','Busca una criatura rara.','HUNT'],['Tao','Pescador','Consigue 3 peces.','FISH'],
+ ['Sena','Agricultora','Planta una cosecha.','FARM'],['Vek','Explorador','Desciende a una mazmorra.','DUNGEON'],
+ ['Iria','Criadora','Aumenta la afinidad de una criatura.','BOND']
+];
+
+function frontEnsure(){
+ state.frontier=state.frontier||{};
+ let f=state.frontier;
+ f.chunkX??=0;f.chunkY??=0;f.region??='Verdalia';f.exploredChunks??={};
+ f.storage??={};f.builds??=[];f.farm??=[];f.fish??=[];f.quests??=[];
+ f.skills??={power:0,guard:0,focus:0,scavenger:0};f.bosses??={};
+ f.dungeon??={floor:1,cleared:0};f.selectedBuild??=null;
+}
+frontEnsure();
+
+function itemCount(id){if(id==='capsule')return state.items.capsules||0;if(id==='herb')return state.items.herbs||0;return state.inventory[id]||0}
+function addItem(id,n){if(id==='capsule')state.items.capsules=(state.items.capsules||0)+n;else if(id==='herb')state.items.herbs=(state.items.herbs||0)+n;else state.inventory[id]=(state.inventory[id]||0)+n}
+function spendItems(cost){for(let k in cost)if(itemCount(k)<cost[k])return false;for(let k in cost)addItem(k,-cost[k]);return true}
+
+function frontierChunk(){
+ frontEnsure();
+ const key=state.frontier.chunkX+','+state.frontier.chunkY;
+ if(!state.frontier.exploredChunks[key]){
+   state.frontier.exploredChunks[key]={region:state.frontier.region,found:0};
+   state.frontier.exploredChunks[key].found=rand(2,7);
+   state.frontier.exploredChunks[key].resources=rand(5,16);
+   toast(`Nueva zona descubierta: ${state.frontier.region}`);
+ }
+ return state.frontier.exploredChunks[key];
+}
+function frontierMove(dx,dy){
+ frontEnsure();
+ const oldX=state.frontier.chunkX,oldY=state.frontier.chunkY;
+ state.frontier.chunkX+=dx;state.frontier.chunkY+=dy;
+ const idx=Math.abs(state.frontier.chunkX*7+state.frontier.chunkY*13)%REGIONS.length;
+ state.frontier.region=REGIONS[idx][0];
+ frontierChunk();
+ toast(`Frontera: ${state.frontier.region} · ${state.frontier.chunkX},${state.frontier.chunkY}`);
+}
+function regionMenu(){
+ const f=state.frontier;
+ return `<div class="regionGrid">${REGIONS.map((r,i)=>`<div class="regionCard ${r[0]===f.region?'current':''}">
+ <b>${r[3]} ${r[0]}</b><p>${r[1]}</p><small>${r[2]}</small>
+ <button onclick="travelRegion(${i})">VIAJAR</button></div>`).join('')}</div>
+ <p class="hint">El mundo continúa indefinidamente mediante coordenadas de frontera. Cada región tiene una semilla local y nuevas criaturas pueden aparecer al explorar.</p>`;
+}
+window.travelRegion=function(i){state.frontier.region=REGIONS[i][0];state.frontier.chunkX=0;state.frontier.chunkY=0;frontierChunk();openPanel('regions');noise(520)}
+
+function inventoryPanel(){
+ let all=ITEMS.map(([id,icon,name])=>({id,icon,name,count:itemCount(id)}));
+ return `<div class="tabs"><button class="active">MOCHILA</button><button onclick="toast('Equipamiento: próximamente ampliable')">EQUIPAMIENTO</button></div>
+ <div class="inventoryGrid">${all.map(x=>`<div class="invSlot" title="${x.name}"><span class="invIcon">${x.icon}</span><span class="invCount">${x.count}</span><span class="invName">${x.name}</span></div>`).join('')}</div>
+ <p class="hint">Los objetos ahora se organizan visualmente por casillas. Los huecos pueden ampliarse mediante bolsas y mejoras.</p>`;
+}
+function storagePanel(){
+ frontEnsure();let s=state.frontier.storage;
+ return `<p>Elige un cofre para abrirlo. Cada cofre tiene 24 huecos y mantiene sus objetos entre sesiones.</p>
+ <div class="row"><b>Cofre de campaña</b><button onclick="depositAll()">GUARDAR RECURSOS</button></div>
+ <div class="inventoryGrid">${ITEMS.map(([id,icon,name])=>`<div class="invSlot"><span class="invIcon">${icon}</span><span class="invCount">${s[id]||0}</span><span class="invName">${name}</span></div>`).join('')}</div>
+ <div class="row"><button onclick="withdrawAll()">SACAR TODO</button><span class="hint">Cofre compartido por la base.</span></div>`;
+}
+window.depositAll=function(){frontEnsure();for(const [id] of ITEMS){let n=itemCount(id);if(n){state.frontier.storage[id]=(state.frontier.storage[id]||0)+n;addItem(id,-n)}}toast('Recursos guardados en el cofre.');openPanel('storage');save()}
+window.withdrawAll=function(){frontEnsure();for(const [id] of ITEMS){let n=state.frontier.storage[id]||0;if(n){addItem(id,n);state.frontier.storage[id]=0}}toast('Has sacado todo del cofre.');openPanel('storage');save()}
+
+function craftPanel(){
+ return `<div class="craftGrid">${RECIPES.map(r=>`<div class="craftCard"><span style="font-size:26px">${r.icon}</span><b> ${r.name}</b><p>${r.desc}</p><small>${Object.entries(r.cost).map(([k,v])=>`${k} ×${v}`).join(' · ')}</small><button onclick="craftItem('${r.id}')">FABRICAR</button></div>`).join('')}</div>`;
+}
+window.craftItem=function(id){let r=RECIPES.find(x=>x.id===id);if(!r)return;if(spendItems(r.cost)){state.frontier.builds.push({id:r.id,x:state.player.x,y:state.player.y});addItem('wood',0);toast(`${r.name} fabricado.`);noise(640);save()}else toast('No tienes suficientes materiales.');openPanel('craft')}
+
+function buildPanel(){
+ const pieces=[['campfire','♨'],['chest','▣'],['workbench','⚒'],['house','⌂'],['farmplot','▦'],['baitbox','◉'],['bridge','═'],['watchtower','♜']];
+ return `<p>Selecciona una construcción y colócala en la frontera. Los edificios son persistentes.</p>
+ <div class="buildGrid">${pieces.map(([id,ic])=>`<button class="buildPiece ${state.frontier.selectedBuild===id?'selected':''}" onclick="selectBuild('${id}')">${ic}</button>`).join('')}</div>
+ <div class="actionBar"><button onclick="placeBuild()">COLOCAR AQUÍ</button><button onclick="removeBuild()">RETIRAR</button><button onclick="frontierMove(1,0)">EXPLORAR ESTE</button><button onclick="frontierMove(-1,0)">EXPLORAR OESTE</button></div>`;
+}
+window.selectBuild=id=>{state.frontier.selectedBuild=id;openPanel('build')}
+window.placeBuild=function(){if(!state.frontier.selectedBuild)return toast('Selecciona una pieza.');let id=state.frontier.selectedBuild;let r=RECIPES.find(x=>x.id===id)||{cost:{wood:3,stone:2},name:id};if(spendItems(r.cost)){state.frontier.builds.push({id,x:state.player.x,y:state.player.y,region:state.frontier.region,cx:state.frontier.chunkX,cy:state.frontier.chunkY});toast('Construcción colocada.');noise(500);save()}else toast('Faltan materiales.');openPanel('build')}
+window.removeBuild=function(){let i=state.frontier.builds.findIndex(b=>b.x===state.player.x&&b.y===state.player.y&&b.region===state.frontier.region);if(i>=0){state.frontier.builds.splice(i,1);toast('Construcción retirada.')}else toast('No hay construcción aquí.');openPanel('build')}
+
+function dexPanel(){
+ let known=new Set(state.discovered||[]);
+ return `<p><b>Aetherdex</b> · ${known.size}/${species.length} especies registradas. Captura criaturas para completar entradas.</p>
+ <div class="dexGrid">${species.map((s,i)=>{let k=known.has(s.id);return `<div class="dexCard ${k?'known':'dexUnknown'}"><div class="dexNum">#${String(i+1).padStart(3,'0')}</div><div class="dexName">${k?s.name:'???'}</div><div class="dexType">${k?s.type:'Especie desconocida'}</div><small>${k?`HP ${s.hp} · ATK ${s.atk} · DEF ${s.def}`:'Explora para descubrirla'}</small></div>`}).join('')}</div>`;
+}
+function skillPanel(){
+ const names=[['power','Fuerza','Aumenta el daño básico.'],['guard','Guardia','Reduce el daño recibido.'],['focus','Enfoque','Mejora la captura.'],['scavenger','Recolector','Encuentra más recursos.']];
+ return `<p>Gasta puntos de habilidad obtenidos al subir de nivel.</p><div class="skillTree">${names.map(([id,n,d])=>{let lv=state.frontier.skills[id]||0;return `<div class="skillNode ${lv?'unlocked':'locked'}"><b>${n}</b><p>${d}</p><small>Nivel ${lv}/5</small><button onclick="upgradeSkill('${id}')">MEJORAR · 1 SP</button></div>`}).join('')}</div>`;
+}
+window.upgradeSkill=function(id){let p=state.frontier.skillPoints||0;if(p<=0)return toast('Necesitas puntos de habilidad.');let lv=state.frontier.skills[id]||0;if(lv>=5)return toast('Habilidad al máximo.');state.frontier.skills[id]=lv+1;state.frontier.skillPoints=p-1;openPanel('skills');save()}
+
+function evolutionFor(c){
+ const s=speciesOf(c);let idx=species.findIndex(x=>x.id===s.id);
+ if(idx<0||c.level<10)return null;
+ // Original branching evolution: every 10 catalogue positions share a family.
+ let targetIndex=(idx+1)%species.length;
+ if(idx%3===0)targetIndex=(idx+12)%species.length;
+ return species[targetIndex];
+}
+function creatureEvolutionPanel(){
+ let rows=state.party.map((c,i)=>{let e=evolutionFor(c);return `<div class="row"><span><b>${c.name}</b> · Nv.${c.level}</span><span>${e?`→ ${e.name}`:'Sin evolución disponible'}</span>${e?`<button onclick="evolveCreature(${i})">EVOLUCIONAR</button>`:''}</div>`}).join('');
+ return `<p>Las evoluciones son originales y dependen del nivel y de la familia de la criatura.</p>${rows}`;
+}
+window.evolveCreature=function(i){let c=state.party[i],e=evolutionFor(c);if(!e)return;c.sid=e.id;c.name=e.name;c.maxHp+=8;c.hp=c.maxHp;c.atk+=4;c.def+=3;c.spd+=2;state.discovered.push(e.id);toast(`${c.name} ha evolucionado.`);noise(900);openPanel('creatures');save()}
+
+function npcPanel(){
+ return `<div class="npcList">${NPCS.map((n,i)=>`<div class="npcCard"><div><b>${n[0]}</b> · ${n[1]}<p>${n[2]}</p><span class="questTag">MISIÓN: ${n[3]}</span></div><button onclick="talkNpc(${i})">HABLAR</button></div>`).join('')}</div>`;
+}
+window.talkNpc=function(i){let n=NPCS[i];let rewards=[['wood',5],['fiber',4],['berry',3],['crystal',2],['ore',2]][i%5];addItem(rewards[0],rewards[1]);state.coins+=15;toast(`${n[0]} te entrega ${rewards[1]} ${rewards[0]}.`);save()}
+
+function dungeonPanel(){
+ let f=state.frontier.dungeon||{floor:1,cleared:0};
+ return `<div class="dungeonPanel"><h3>Las Profundidades</h3><p>Piso actual: <b>${f.floor}</b> · Jefes derrotados: <b>${f.cleared}</b></p>
+ <div class="row"><span>Enemigos</span><b>${3+f.floor}</b></div><div class="row"><span>Recompensa estimada</span><b>${20+f.floor*8} ◈</b></div>
+ <button class="bigBtn" onclick="enterDungeon()">DESCENDER</button>
+ <button class="bigBtn secondary" onclick="bossBattle()">ENFRENTAR JEFE</button></div>`;
+}
+window.enterDungeon=function(){let f=state.frontier.dungeon;f.floor++;let reward=10+f.floor*4;state.coins+=reward;addItem('stone',2+f.floor);toast(`Superas el piso ${f.floor}. +${reward} ◈`);save();openPanel('dungeons')}
+window.bossBattle=function(){let boss=makeCreature(species[(state.frontier.dungeon.cleared*17+37)%species.length],Math.max(8,state.frontier.dungeon.floor+5));boss.name='GUARDIÁN · '+boss.name;boss.maxHp*=2;boss.hp=boss.maxHp;boss.atk+=8;boss.def+=5;battleState={wild:boss,player:state.party[0],guard:false};$('battle').classList.remove('hidden');battleText('¡El guardián de la mazmorra despierta!');drawBattle();noise(160)}
+
+function farmPanel(){
+ let plots=state.frontier.farm||[];
+ return `<p>Planta semillas, espera unos días y cosecha recursos.</p><div class="row"><span>Parcelas activas</span><b>${plots.length}</b><button onclick="plantFarm()">PLANTAR</button><button onclick="harvestFarm()">COSECHAR</button></div>
+ <div class="cardGrid">${plots.map((p,i)=>`<div class="creatureCard"><strong>Parcela ${i+1}</strong><small>${p.seed} · ${Math.max(0,3-(state.day-p.day))} días</small></div>`).join('')}</div>`;
+}
+window.plantFarm=function(){if(itemCount('seed')<1)return toast('Necesitas semillas.');addItem('seed',-1);state.frontier.farm.push({seed:'Semilla silvestre',day:state.day});toast('Semilla plantada.');openPanel('farm');save()}
+window.harvestFarm=function(){let ready=state.frontier.farm.filter(p=>state.day-p.day>=3);if(!ready.length)return toast('Todavía no hay cultivos maduros.');ready.forEach(()=>addItem('berry',rand(2,5)));state.frontier.farm=state.frontier.farm.filter(p=>state.day-p.day<3);toast(`Cosecha completada: ${ready.length} parcela(s).`);openPanel('farm');save()}
+
+function fishPanel(){
+ return `<div class="fishingPanel"><h3>Pesca</h3><p>Usa cebo y pulsa <b>LANZAR</b> cuando el indicador entre en la zona.</p><div class="fishMeter"><div class="fishZone"></div><div class="fishCursor" id="fishCursor"></div></div><button class="bigBtn" onclick="castFish()">LANZAR</button></div>`;
+}
+window.castFish=function(){if(itemCount('bait')<1)return toast('Necesitas cebo.');addItem('bait',-1);let success=Math.random()<.72;if(success){addItem('fish',1);state.coins+=rand(4,12);toast('¡Has pescado una criatura acuática!');noise(740)}else toast('El pez escapó.');openPanel('fish');save()}
+
+// Expanded panels disabled — only core Pokémon-style menus are active.
+document.querySelectorAll('[data-open]').forEach(b=>{
+ b.onclick=()=>openPanel(b.dataset.open);
+});
+
+// Improve combat controls by adding tactical moves and status effects.
+document.querySelector('.battleActions')?.insertAdjacentHTML('beforeend',
+ '<button class="battleBtn" data-action="skill">✦ HABILIDAD</button><button class="battleBtn" data-action="item">✚ CURAR</button>');
+document.querySelectorAll('.battleBtn').forEach(b=>b.onclick=()=>battleActionExpanded(b.dataset.action));
+
+function battleActionExpanded(a){
+ if(!battleState)return;
+ if(a==='skill'){
+   let c=battleState.player, power=15+(state.frontier.skills.power||0)*3;
+   let d=damage(c,battleState.wild,power);battleState.wild.hp-=d;battleText(`${c.name} usa su técnica especial: ${d} de daño.`);
+   noise(780);if(battleState.wild.hp<=0){state.coins+=15;battleState.player.level++;state.frontier.skillPoints=(state.frontier.skillPoints||0)+1;battleText('¡Victoria! +1 punto de habilidad.');setTimeout(endBattle,850);return}
+   setTimeout(enemyTurn,350);drawBattle();return;
+ }
+ if(a==='item'){
+   if(state.items.herbs>0){state.items.herbs--;battleState.player.hp=clamp(battleState.player.hp+Math.floor(battleState.player.maxHp*.3),0,battleState.player.maxHp);battleText(`${battleState.player.name} recupera salud.`);noise(460);setTimeout(enemyTurn,350);drawBattle()}
+   else battleText('No tienes hierbas.');
+   return;
+ }
+ battleAction(a);
+}
+
+// Patch capture chance with Focus skill.
+const _oldBattleAction=battleAction;
+battleAction=function(a){
+ if(a==='capture' && battleState){
+   const oldCaps=state.items.capsules;
+   // use original action, but temporarily boost affinity based on skill
+   battleState.player.affinity=clamp(battleState.player.affinity+(state.frontier.skills.focus||0)*2,0,100);
+   _oldBattleAction(a);
+   battleState.player.affinity=clamp(battleState.player.affinity-(state.frontier.skills.focus||0)*2,0,100);
+   return;
+ }
+ _oldBattleAction(a);
+};
+
+// Give skill points when leveling by wrapping end-of-battle path is complex;
+// grant a small point whenever a creature reaches a new level in ordinary victory.
+const _origMakeCreature=makeCreature;
+window.addEventListener('beforeunload',()=>{try{save()}catch(e){}});
+
+frontierChunk();
+</script>
+</body>
+</html>

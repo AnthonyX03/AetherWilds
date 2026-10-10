@@ -1,0 +1,33 @@
+@font-face{font-family:Pixel;src:local("Courier New");}
+:root{--bg:#0b1020;--panel:#151d31;--line:#52627f;--text:#f4f7ff;--muted:#9eabc5;--accent:#7cf5c4;--accent2:#ffcc66;--danger:#ff6b7a}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b14;color:var(--text);font-family:Pixel,monospace}
+button{font:inherit;color:inherit;cursor:pointer;border:0}.hidden{display:none!important}
+#app{position:relative;width:100%;height:100%;display:grid;place-items:center;background:#070b14}
+#game{width:100vw;height:100vh;image-rendering:pixelated;image-rendering:crisp-edges;object-fit:contain;background:#182437}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(4,7,14,.48);backdrop-filter:blur(2px)}
+.titleCard{width:min(620px,90vw);padding:40px 34px;text-align:center;background:linear-gradient(180deg,#18233a,#0d1424);border:4px solid #617396;box-shadow:10px 10px 0 #050812, inset 0 0 0 3px #10182a}
+.eyebrow{letter-spacing:4px;color:var(--accent);font-size:12px;margin-bottom:12px}
+h1{font-size:clamp(42px,9vw,82px);line-height:.9;margin:0 0 20px;text-shadow:5px 5px 0 #000}
+h1 span,.brand span{color:var(--accent)}
+.titleCard p{color:#cbd4e8;line-height:1.6;margin:0 auto 26px;max-width:500px}
+.titleCard small{color:#73819d}.menuBtns{display:grid;gap:12px;max-width:360px;margin:0 auto}
+.bigBtn,.menuGrid button,.battleBtn{background:#243451;border:3px solid #7284a8;padding:14px 18px;box-shadow:4px 4px 0 #070b14;text-transform:uppercase}
+.bigBtn:hover,.menuGrid button:hover,.battleBtn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 #070b14}.bigBtn.secondary{background:#172238}
+.topbar{position:absolute;top:0;left:0;right:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:linear-gradient(#0a1120dd,#0a112000);z-index:5}
+.brand{font-weight:bold;letter-spacing:2px}.status{display:flex;gap:14px;align-items:center;color:#dce5f7;font-size:12px}
+.pixelBtn{background:#18243b;border:2px solid #647493;padding:7px 10px}
+#partyMini{position:absolute;top:70px;left:18px;display:flex;gap:6px;z-index:4}.partyDot{width:34px;height:34px;background:#17243a;border:2px solid #5b6e91;display:grid;place-items:center;font-size:13px}
+#toast{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:#0c1425eF;border:2px solid #667795;padding:10px 16px;z-index:8;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}.toastOn{opacity:1!important}
+.panel{position:absolute;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,92vw);max-height:86vh;overflow:auto;background:#10192b;border:4px solid #627393;box-shadow:10px 10px 0 #050812;padding:20px}
+.panelHead{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #32415d;margin-bottom:18px}.panelHead h2{margin:0 0 12px}.closeBtn{background:#2a3853;border:2px solid #687b9f;font-size:24px;padding:2px 9px}
+.menuGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.hint{color:#8e9bb5;line-height:1.7;font-size:12px;margin-bottom:0}
+.cardGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}.creatureCard{background:#17233a;border:2px solid #40526f;padding:12px}.creatureCard strong{display:block;font-size:15px;margin-bottom:5px}.bar{height:7px;background:#080d17;margin-top:7px}.bar i{display:block;height:100%;background:var(--accent)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #293750}.row button{background:#263755;padding:7px 10px;border:2px solid #5f7396}
+#battle{background:rgba(6,9,17,.72)}.battlePanel{width:min(900px,94vw);background:#0d1526;border:4px solid #657695;box-shadow:12px 12px #03050a}.battleScene{height:min(420px,58vh);position:relative;overflow:hidden;background:linear-gradient(#35536c 0 60%,#2b4933 60%);border-bottom:4px solid #52627e}
+.battleScene:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 7px,#ffffff08 8px 9px);pointer-events:none}
+.monsterSlot{position:absolute;width:180px;height:150px;display:grid;place-items:center}.monsterSlot.wild{right:14%;top:12%}.monsterSlot.player{left:13%;bottom:2%}.monsterSlot canvas{width:150px;height:125px;image-rendering:pixelated}.monsterName{position:absolute;background:#0b1220dd;border:2px solid #5f708f;padding:7px 10px;white-space:nowrap}
+#battleInfo{position:absolute;left:18px;right:18px;top:18px;display:flex;justify-content:space-between}.statBox{background:#0b1322dd;border:2px solid #52637f;padding:8px 12px;min-width:180px}.hpbar{height:8px;background:#05080e;margin-top:5px}.hpbar i{display:block;height:100%;background:var(--accent)}
+.battleControls{padding:14px;display:grid;grid-template-columns:1fr 2fr;gap:14px}.battleActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.battleBtn{padding:12px;background:#1b2942}.battleBtn[data-action="capture"]{border-color:#d8b260}.battleBtn[data-action="bond"]{border-color:#73d9ba}.battleBtn[data-action="run"]{border-color:#7b8aa8}#battleLog{display:flex;align-items:center;color:#dbe5f7;line-height:1.5;padding:6px}
+#touchControls{position:absolute;inset:0;z-index:12;pointer-events:none}.dpad,.touchActions{position:absolute;bottom:18px;pointer-events:auto}.dpad{left:18px;width:142px;height:142px}.dpad button{position:absolute;width:46px;height:46px;background:#17243dcc;border:2px solid #7182a2;border-radius:7px}.dpad button[data-dir=up]{left:48px;top:0}.dpad button[data-dir=left]{left:0;top:48px}.dpad button[data-dir=down]{left:48px;top:96px}.dpad button[data-dir=right]{left:96px;top:48px}.touchActions{right:20px;display:flex;gap:12px}.touchActions button{width:62px;height:62px;border-radius:50%;background:#253552dd;border:3px solid #7182a2;font-weight:bold}
+@media(max-width:700px){.titleCard{padding:28px 18px}.battleControls{grid-template-columns:1fr}.battleScene{height:50vh}.statBox{min-width:0;font-size:10px}.monsterSlot{transform:scale(.8)}.panel{padding:14px}.menuGrid{grid-template-columns:1fr 1fr}.brand{font-size:12px}.status{font-size:9px}.topbar{padding:0 10px}}
+@media(pointer:coarse){#touchControls{display:block}.status #dayLabel{display:none}}
